@@ -1,0 +1,318 @@
+@import "tailwindcss";
+@import "@fontsource/plus-jakarta-sans/400.css";
+@import "@fontsource/plus-jakarta-sans/500.css";
+@import "@fontsource/plus-jakarta-sans/600.css";
+@import "@fontsource/plus-jakarta-sans/700.css";
+
+/* ═══════════════════════════════════════════════════════
+   THEME SYSTEM
+   All colours are CSS custom properties so switching
+   data-theme on <html> re-themes the entire app instantly
+   with no page reload.
+
+   To add a new theme:
+     1. Add a [data-theme="name"] block below
+     2. Override every --color-* variable you want to change
+     3. Add the theme name to THEMES in src/hooks/useTheme.js
+═══════════════════════════════════════════════════════ */
+
+/* ── Minimal theme (default) ───────────────────────── */
+:root {
+  /* Surfaces */
+  --color-base:         #FFFFFF;
+  --color-surface:      #F8FAFC;
+
+  /* Text */
+  --color-text:         #111827;
+  --color-muted:        #6B7280;
+
+  /* Border */
+  --color-border:       #E5E7EB;
+
+  /* Active accent — default preset is Dusk */
+  --color-accent:       #4F46E5;
+  --color-accent-soft:  #EEF2FF;
+
+  /* The 6 accent presets the user can choose from */
+  --accent-slate:  #64748B;
+  --accent-sage:   #6B8F71;
+  --accent-dusk:   #4F46E5;
+  --accent-clay:   #C2714F;
+  --accent-stone:  #78716C;
+  --accent-rose:   #BE8A9D;
+
+  /* Typography */
+  --font-sans:   'Plus Jakarta Sans', sans-serif;
+  --tracking:    -0.01em;
+  --leading:     1.6;
+
+  /* Layout */
+  --nav-height:  64px;
+  --pause-size:  44px;
+}
+
+/* ── Playful theme ──────────────────────────────────── */
+[data-theme="playful"] {
+  --color-base:        #FFFBF5;
+  --color-surface:     #FFF8EE;
+  --color-text:        #1C1917;
+  --color-muted:       #78716C;
+  --color-accent:      #F59E0B;
+  --color-accent-soft: #FEF3C7;
+  --color-border:      #FDE68A;
+  --tracking:          0.01em;
+  --leading:           1.75;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-base);
+  color: var(--color-text);
+  letter-spacing: var(--tracking);
+  line-height: var(--leading);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Centre the 390px mobile shell on desktop */
+#root {
+  max-width: 390px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background-color: var(--color-base);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════════════════ */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background-color: var(--color-base);
+  position: relative;
+}
+
+/* Scrollable content area — padded so it never hides under nav */
+.app-shell__main {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: calc(var(--nav-height) + 56px);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCREEN PLACEHOLDERS
+═══════════════════════════════════════════════════════ */
+
+.screen {
+  padding: 40px 24px 24px;
+  min-height: 100%;
+  background-color: var(--color-base);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.screen__eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 8px;
+}
+
+.screen__title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.screen__desc {
+  font-size: 15px;
+  color: var(--color-muted);
+  line-height: var(--leading);
+  max-width: 320px;
+}
+
+.screen__card {
+  margin-top: 32px;
+  padding: 20px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+}
+
+.screen__card-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+.screen__card-value {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+/* ═══════════════════════════════════════════════════════
+   BOTTOM NAVIGATION
+═══════════════════════════════════════════════════════ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
+  height: var(--nav-height);
+  display: flex;
+  align-items: stretch;
+  background-color: var(--color-base);
+  border-top: 1px solid var(--color-border);
+  z-index: 40;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.bottom-nav__tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-decoration: none;
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  padding: 8px 0;
+}
+
+.bottom-nav__tab:hover {
+  color: var(--color-text);
+}
+
+.bottom-nav__tab--active {
+  color: var(--color-accent);
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAUSE BUTTON
+   Floats centred just above the nav bar on every screen.
+   Will trigger 3-2-1 grounding sequence (future feature).
+═══════════════════════════════════════════════════════ */
+
+.pause-button {
+  position: fixed;
+  bottom: calc(var(--nav-height) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: var(--pause-size);
+  height: var(--pause-size);
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-base);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-muted);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pause-button:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.pause-button:active {
+  transform: translateX(-50%) scale(0.94);
+}
+
+/* ═══════════════════════════════════════════════════════
+   THEME PICKER  (Me screen)
+═══════════════════════════════════════════════════════ */
+
+.theme-picker {
+  margin-top: 40px;
+}
+
+.theme-picker__label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 12px;
+}
+
+.theme-picker__buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.theme-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: var(--tracking);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.theme-btn--active {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-weight: 600;
+}

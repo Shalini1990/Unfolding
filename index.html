@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-theme="minimal">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#4F46E5" />
+    <meta name="description" content="A daily positivity app" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Unfolding" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <title>Unfolding</title>
+    <!-- Apply saved theme before first paint to prevent flash -->
+    <script>
+      (function () {
+        var t = localStorage.getItem('unfolding-theme')
+        if (t === 'playful' || t === 'minimal') {
+          document.documentElement.setAttribute('data-theme', t)
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
