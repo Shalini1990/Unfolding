@@ -11,7 +11,8 @@ function getInitialTheme() {
   return THEMES.includes(attr) ? attr : 'minimal'
 }
 
-function applyTheme(theme) {
+// Exported so the onboarding flow can apply a theme without the full hook.
+export function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme)
   // Mirror to localStorage for flash-free reads in index.html inline script
   localStorage.setItem(STORAGE_KEY, theme)

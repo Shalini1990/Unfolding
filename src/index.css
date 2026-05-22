@@ -316,3 +316,402 @@ body {
   color: var(--color-accent);
   font-weight: 600;
 }
+
+/* ═══════════════════════════════════════════════════════
+   ONBOARDING FLOW
+   All screens use theme CSS variables — they re-skin
+   instantly when the user picks a theme on Screen 3.
+═══════════════════════════════════════════════════════ */
+
+.onboarding {
+  min-height: 100dvh;
+  background-color: var(--color-base);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.25s ease;
+}
+
+/* Wrapper re-mounts on step change — triggers entrance animation */
+.ob-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  animation: ob-enter 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ob-enter {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Screen shell ─────────────────────────────────── */
+
+.ob-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+}
+
+/* Welcome and Ready screens have their own vertical rhythm */
+.ob-screen--welcome,
+.ob-screen--ready {
+  padding-top: 0;
+}
+
+/* Footer must always stretch full width regardless of parent align-items */
+.ob-footer {
+  width: 100%;
+}
+
+.ob-content {
+  flex: 1;
+  padding-top: 60px;
+}
+
+.ob-footer {
+  padding: 20px 0 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Typography ───────────────────────────────────── */
+
+.ob-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.ob-title--hero {
+  font-size: 44px;
+  letter-spacing: -0.025em;
+}
+
+.ob-tagline {
+  font-size: 18px;
+  color: var(--color-muted);
+  font-style: italic;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.ob-subtitle {
+  font-size: 15px;
+  color: var(--color-muted);
+  line-height: var(--leading);
+  margin-bottom: 4px;
+}
+
+/* ── Welcome screen ───────────────────────────────── */
+
+.ob-welcome-mark {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background-color: var(--color-accent-soft);
+  border: 1.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  margin-top: 72px;
+  margin-bottom: 32px;
+}
+
+.ob-welcome-text {
+  margin-bottom: auto;
+  padding-bottom: 40px;
+}
+
+/* ── Privacy screen ───────────────────────────────── */
+
+.ob-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background-color: var(--color-accent-soft);
+  border: 1.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  margin-bottom: 20px;
+}
+
+.ob-privacy-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.ob-privacy-list li {
+  font-size: 15px;
+  color: var(--color-text);
+  line-height: 1.55;
+  padding-left: 22px;
+  position: relative;
+}
+
+.ob-privacy-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+}
+
+/* ── Theme selection screen ───────────────────────── */
+
+.ob-theme-cards {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.ob-theme-card {
+  flex: 1;
+  border: 2px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: var(--color-surface);
+  text-align: left;
+  transition: border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ob-theme-card--selected {
+  border-color: var(--color-accent);
+}
+
+.ob-theme-card__swatch {
+  height: 90px;
+}
+
+/* Hardcoded backgrounds — always preview each theme regardless of active theme */
+.ob-swatch-minimal {
+  height: 100%;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.ob-swatch-playful {
+  height: 100%;
+  background: #FFFBF5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #FDE68A;
+}
+
+.ob-swatch-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.ob-swatch-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+}
+
+.ob-swatch-warm-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #F59E0B;
+}
+
+.ob-swatch-sample {
+  font-size: 10px;
+  color: #111827;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.ob-swatch-sample--tight {
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+.ob-swatch-sample--loose {
+  letter-spacing: 0.04em;
+  color: #1C1917;
+  font-weight: 500;
+}
+
+.ob-theme-card__body {
+  padding: 10px 12px 12px;
+}
+
+.ob-theme-card__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.ob-theme-card__desc {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.ob-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+/* ── North Star textarea ──────────────────────────── */
+
+.ob-textarea {
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--color-text);
+  line-height: var(--leading);
+  letter-spacing: var(--tracking);
+  resize: none;
+  margin-top: 24px;
+  outline: none;
+  transition: border-color 0.15s ease;
+  -webkit-appearance: none;
+}
+
+.ob-textarea:focus {
+  border-color: var(--color-accent);
+}
+
+.ob-textarea::placeholder {
+  color: var(--color-muted);
+  opacity: 0.65;
+}
+
+/* ── Notification time pickers ────────────────────── */
+
+.ob-time-pickers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.ob-time-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 14px;
+  font-size: 15px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.ob-time-input {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-accent);
+  border: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  letter-spacing: var(--tracking);
+  -webkit-appearance: none;
+}
+
+/* ── Ready screen ─────────────────────────────────── */
+
+.ob-screen--ready {
+  padding-top: 0;
+}
+
+.ob-ready-graphic {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--color-accent-soft);
+  border: 1.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  margin-bottom: 32px;
+}
+
+.ob-ready-text {
+  margin-bottom: auto;
+  padding-bottom: 40px;
+}
+
+/* ── Shared CTA & skip buttons ────────────────────── */
+
+.ob-cta {
+  width: 100%;
+  height: 56px;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: var(--tracking);
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease, background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ob-cta:hover  { opacity: 0.9; }
+.ob-cta:active { transform: scale(0.98); }
+
+.ob-skip {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  min-height: 44px;
+  letter-spacing: var(--tracking);
+  padding: 4px 0;
+  transition: color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ob-skip:hover { color: var(--color-text); }
