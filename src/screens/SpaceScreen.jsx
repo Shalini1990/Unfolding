@@ -35,7 +35,8 @@ export default function SpaceScreen() {
 
   function handleDoorChange(newDoor) {
     setDoor(newDoor)
-    // Reset scroll so the section content is immediately visible at the top
+    setParkMode('add')   // clear any revisit/focused state from ParkingLot
+    setKwMode('view')    // clear any hardday state from KindWordsJar
     const el = document.querySelector('.app-shell__main')
     if (el) el.scrollTop = 0
   }

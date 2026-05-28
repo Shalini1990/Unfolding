@@ -4096,7 +4096,7 @@ body {
 .space-screen {
   min-height: 100%;
   background-color: var(--color-base);
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 92px);
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 32px);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
