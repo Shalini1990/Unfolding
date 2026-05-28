@@ -33,6 +33,13 @@ export default function SpaceScreen() {
   const isHardDay    = kwMode   === 'hardday'
   const focused      = isRevisiting || isHardDay
 
+  function handleDoorChange(newDoor) {
+    setDoor(newDoor)
+    // Reset scroll so the section content is immediately visible at the top
+    const el = document.querySelector('.app-shell__main')
+    if (el) el.scrollTop = 0
+  }
+
   function handleRoomClose() {
     setRoomOpen(false)
     setDoor('park')   // spec: return to park door on exit
@@ -53,7 +60,7 @@ export default function SpaceScreen() {
             {/* Park it */}
             <button
               className={`ys-door${door === 'park' ? ' ys-door--park-on' : ' ys-door--off'}`}
-              onClick={() => setDoor('park')}
+              onClick={() => handleDoorChange('park')}
               type="button"
             >
               {door === 'park' && (
@@ -69,7 +76,7 @@ export default function SpaceScreen() {
             {/* Let it out */}
             <button
               className={`ys-door ys-door--release${door === 'release' ? ' ys-door--release-on' : ' ys-door--off'}`}
-              onClick={() => setDoor('release')}
+              onClick={() => handleDoorChange('release')}
               type="button"
             >
               {door === 'release' && (
@@ -136,8 +143,8 @@ export default function SpaceScreen() {
         </>
       )}
 
-      {/* ── Kind Words ──────────────────────────────────────────── */}
-      {!isRevisiting && (
+      {/* ── Kind Words — hidden when release door is active ─────── */}
+      {!isRevisiting && door !== 'release' && (
         <>
           {!isHardDay && <div className="space-divider" />}
           <KindWordsJar onModeChange={setKwMode} />
