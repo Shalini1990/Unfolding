@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Wind } from 'lucide-react'
 import ParkingLot from '../space/ParkingLot'
 import ResolvedSection from '../space/ResolvedSection'
@@ -32,6 +32,14 @@ export default function SpaceScreen() {
   const isRevisiting = parkMode === 'revisit'
   const isHardDay    = kwMode   === 'hardday'
   const focused      = isRevisiting || isHardDay
+
+  // Hide the bottom nav while TheRoom is open so it can't overlap the overlay
+  useEffect(() => {
+    const nav = document.querySelector('.bottom-nav')
+    if (!nav) return
+    nav.style.display = roomOpen ? 'none' : ''
+    return () => { nav.style.display = '' }
+  }, [roomOpen])
 
   function handleDoorChange(newDoor) {
     setDoor(newDoor)
