@@ -8,14 +8,18 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // injectManifest lets us use a custom sw.js with our own event handlers
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
       manifest: {
         name: 'Unfolding',
         short_name: 'Unfolding',
-        description: 'A daily positivity app',
-        theme_color: '#4F46E5',
-        background_color: '#ffffff',
+        description: 'A calm daily journal — intentions, reflections, and a little spark. Stays on your device.',
+        theme_color: '#FAFAF8',
+        background_color: '#FAFAF8',
         display: 'standalone',
         start_url: '/',
         scope: '/',

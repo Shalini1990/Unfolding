@@ -19,6 +19,9 @@ export default function Step5Notifications({
         <p className="ob-subtitle">
           Set gentle reminders for your morning and evening rituals.
         </p>
+        <p className="ob-notif-note">
+          Reminders fire while the app is open in your browser — they're not background push notifications.
+        </p>
 
         <div className="ob-time-pickers">
           <label className="ob-time-label">

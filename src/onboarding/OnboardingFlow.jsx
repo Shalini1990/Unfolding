@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChevronLeft } from 'lucide-react'
 import db from '../db/db'
 import { applyTheme } from '../hooks/useTheme'
 import Step1Welcome from './Step1Welcome'
@@ -74,8 +75,21 @@ export default function OnboardingFlow({ onComplete }) {
 
   const StepComponent = STEPS[step - 1]
 
+  // Show back on steps 2–5 (not Welcome or Ready)
+  const showBack = step > 1 && step < 6
+
   return (
     <div className="onboarding">
+      {showBack && (
+        <button
+          className="ob-back"
+          onClick={() => setStep(s => s - 1)}
+          type="button"
+          aria-label="Back"
+        >
+          <ChevronLeft size={20} strokeWidth={2} />
+        </button>
+      )}
       {/* key forces remount on step change, triggering the entrance animation */}
       <div key={step} className="ob-step">
         <StepComponent {...shared} />

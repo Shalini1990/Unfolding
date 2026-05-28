@@ -52,4 +52,9 @@ db.version(1).stores({
   tomorrow_intention: '++id, date',
 })
 
+// v2 — add proper indexes to parking_lot
+db.version(2).stores({
+  parking_lot: '++id, date_parked, status, tag',
+})
+
 export default db

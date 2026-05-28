@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.99.0",
+    "@fontsource/caveat": "^5.2.8",
+    "@fontsource/kalam": "^5.2.8",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
     "dexie": "^4.4.2",
