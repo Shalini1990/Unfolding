@@ -35,10 +35,9 @@ export default function SpaceScreen() {
 
   // Hide the bottom nav while TheRoom is open so it can't overlap the overlay
   useEffect(() => {
-    const nav = document.querySelector('.bottom-nav')
-    if (!nav) return
-    nav.style.display = roomOpen ? 'none' : ''
-    return () => { nav.style.display = '' }
+    if (roomOpen) document.body.classList.add('room-open')
+    else          document.body.classList.remove('room-open')
+    return ()  => document.body.classList.remove('room-open')
   }, [roomOpen])
 
   function handleDoorChange(newDoor) {

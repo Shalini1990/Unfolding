@@ -183,6 +183,9 @@ body {
    BOTTOM NAVIGATION
 ═══════════════════════════════════════════════════════ */
 
+/* Hidden when a fullscreen overlay (TheRoom) is open */
+body.room-open .bottom-nav { display: none !important; }
+
 .bottom-nav {
   position: fixed;
   bottom: 0;
