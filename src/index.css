@@ -333,7 +333,7 @@ body {
 ═══════════════════════════════════════════════════════ */
 
 .me-screen {
-  padding: 28px 20px calc(var(--nav-height) + 40px);
+  padding: 28px 20px calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 40px);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1809,7 +1809,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-bottom: calc(var(--nav-height) + 40px);
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 40px);
 }
 
 /* ── Greeting header ──────────────────────────────── */
@@ -4096,7 +4096,7 @@ body {
 .space-screen {
   min-height: 100%;
   background-color: var(--color-base);
-  padding-bottom: calc(var(--nav-height) + 32px);
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 32px);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -5444,7 +5444,7 @@ body {
 ═══════════════════════════════════════════════════════ */
 
 .settle-screen {
-  min-height: calc(100dvh - var(--nav-height) - 40px);
+  min-height: calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom, 0px) - 40px);
   display: flex;
   flex-direction: column;
   padding: 28px 24px 40px;
@@ -5608,7 +5608,7 @@ body {
 
 /* Colour fill mode — lock the screen height so the canvas can flex */
 .settle-screen--fill {
-  height: calc(100dvh - var(--nav-height));
+  height: calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom, 0px));
   min-height: unset;
   padding-bottom: 20px;
 }
