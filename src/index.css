@@ -5206,6 +5206,7 @@ body {
   position: relative;
   flex: 1;
   margin-top: 28px;
+  margin-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
   overflow: hidden;
 }
 
@@ -5257,11 +5258,13 @@ body {
 /* ── Bottom bar ───────────────────────────────────────── */
 
 .room-bottom {
+  position: absolute;
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  left: 22px;
+  right: 22px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  flex-shrink: 0;
-  padding-top: 14px;
 }
 
 .room-meta-row {
