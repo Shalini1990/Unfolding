@@ -122,9 +122,11 @@ export default function App() {
                 <Route path="*"       element={<Navigate to="/home" replace />} />
               </Routes>
             </main>
-            <PauseButton onPress={() => setGroundingOpen(true)} />
+            {features.includes('grounding') && (
+              <PauseButton onPress={() => setGroundingOpen(true)} />
+            )}
             <BottomNav />
-            {groundingOpen && (
+            {groundingOpen && features.includes('grounding') && (
               <GroundingOverlay onClose={() => setGroundingOpen(false)} />
             )}
           </div>

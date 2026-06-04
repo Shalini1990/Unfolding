@@ -327,7 +327,7 @@ export default function HomeScreen() {
         onThumb={handleQuoteThumb}
       />
 
-      {isEvening && features.includes('evening') && <EveningPromptCard done={eveningDone} />}
+      {isEvening && <EveningPromptCard done={eveningDone} />}
       <NorthStarLine text={northStar} />
 
       {tomorrowText && <TomorrowCard text={tomorrowText} dateSet={tomorrowDateSet} />}

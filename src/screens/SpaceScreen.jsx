@@ -4,6 +4,7 @@ import ParkingLot from '../space/ParkingLot'
 import ResolvedSection from '../space/ResolvedSection'
 import KindWordsJar from '../space/KindWordsJar'
 import TheRoom from '../space/TheRoom'
+import { useFeatures } from '../context/FeaturesContext'
 
 // ── Mini jar glyph (spec-exact amber) ───────────────────────────
 function MiniJar() {
@@ -24,6 +25,7 @@ function MiniJar() {
 }
 
 export default function SpaceScreen() {
+  const { features } = useFeatures()
   const [door,      setDoor]      = useState('park')   // 'park' | 'release'
   const [parkMode,  setParkMode]  = useState('add')    // 'add'  | 'revisit'
   const [kwMode,    setKwMode]    = useState('view')   // 'view' | 'hardday'
@@ -152,7 +154,7 @@ export default function SpaceScreen() {
       )}
 
       {/* ── Kind Words — hidden when release door is active ─────── */}
-      {!isRevisiting && door !== 'release' && (
+      {features.includes('kind_words') && !isRevisiting && door !== 'release' && (
         <>
           {!isHardDay && <div className="space-divider" />}
           <KindWordsJar onModeChange={setKwMode} />
