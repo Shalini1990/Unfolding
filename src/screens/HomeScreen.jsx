@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bell, X } from 'lucide-react'
+import { useFeatures } from '../context/FeaturesContext'
 import db from '../db/db'
 import { getTodayDate, getDayNumber } from '../utils/date'
 import { pickQuote } from '../data/quotes'
@@ -106,6 +107,7 @@ async function archiveOldIntentions(today) {
 }
 
 export default function HomeScreen() {
+  const { features } = useFeatures()
   const [loading, setLoading] = useState(true)
   const [todayRecord, setTodayRecord] = useState(null)
   const [northStar, setNorthStar] = useState(null)
@@ -325,7 +327,7 @@ export default function HomeScreen() {
         onThumb={handleQuoteThumb}
       />
 
-      {isEvening && <EveningPromptCard done={eveningDone} />}
+      {isEvening && features.includes('evening') && <EveningPromptCard done={eveningDone} />}
       <NorthStarLine text={northStar} />
 
       {tomorrowText && <TomorrowCard text={tomorrowText} dateSet={tomorrowDateSet} />}
@@ -336,13 +338,15 @@ export default function HomeScreen() {
         onTick={handleTick}
       />
 
-      <SparkCard
-        spark={todaysSpark}
-        animationKey={sparkAnimKey}
-        onDone={handleSparkDone}
-        onSkip={handleSparkSkip}
-        onShuffle={handleSparkShuffle}
-      />
+      {features.includes('spark') && (
+        <SparkCard
+          spark={todaysSpark}
+          animationKey={sparkAnimKey}
+          onDone={handleSparkDone}
+          onSkip={handleSparkSkip}
+          onShuffle={handleSparkShuffle}
+        />
+      )}
     </div>
   )
 }

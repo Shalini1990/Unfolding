@@ -4,7 +4,7 @@ import {
   Zap, BookOpen, Lightbulb, ListChecks,
   ChevronDown, ChevronUp,
   Palette, Shield, Download, User, AlertTriangle, HardDrive, Trash2,
-  Bell, BellOff,
+  Bell, BellOff, LayoutGrid,
 } from 'lucide-react'
 import db from '../db/db'
 import { useTheme } from '../hooks/useTheme'
@@ -14,6 +14,7 @@ import {
   loadNotifSettings,
   saveNotifSettings,
 } from '../utils/notifications'
+import { useFeatures, FEATURE_META } from '../context/FeaturesContext'
 
 // ── Accent presets (matches CSS vars in index.css) ─────────────
 export const ACCENTS = [
@@ -955,6 +956,51 @@ function PrivacySection() {
   )
 }
 
+// ── Features card ──────────────────────────────────────────────
+function FeaturesCard() {
+  const { features, refresh } = useFeatures()
+
+  async function toggle(id) {
+    const next = features.includes(id)
+      ? features.filter(f => f !== id)
+      : [...features, id]
+    const existing = await db.settings.where('key').equals('features_enabled').first()
+    if (existing) await db.settings.update(existing.id, { value: JSON.stringify(next) })
+    else          await db.settings.add({ key: 'features_enabled', value: JSON.stringify(next) })
+    refresh()
+  }
+
+  return (
+    <div className="me-card">
+      <div className="me-card__label">
+        <LayoutGrid size={14} strokeWidth={2.2} className="me-icon" />
+        Features
+      </div>
+      <div className="me-features-list">
+        {FEATURE_META.map(f => {
+          const on = features.includes(f.id)
+          return (
+            <button
+              key={f.id}
+              className={`me-feature-row${on ? ' me-feature-row--on' : ''}`}
+              onClick={() => toggle(f.id)}
+              type="button"
+            >
+              <span className={`me-feature-row__check${on ? ' me-feature-row__check--on' : ''}`}>
+                {on && <Check size={10} strokeWidth={3} />}
+              </span>
+              <span className="me-feature-row__text">
+                <span className="me-feature-row__label">{f.label}</span>
+                <span className="me-feature-row__desc">{f.desc}</span>
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── Main screen ────────────────────────────────────────────────
 export default function MeScreen() {
   const { theme, switchTheme } = useTheme()
@@ -989,7 +1035,10 @@ export default function MeScreen() {
       {/* 2 — App feel */}
       <AppFeel theme={theme} switchTheme={switchTheme} />
 
-      {/* 3 — Notifications */}
+      {/* 3 — Features */}
+      <FeaturesCard />
+
+      {/* 4 — Notifications */}
       <NotificationsCard />
 
       {/* 4 — North Star */}

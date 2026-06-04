@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import FeaturesContext, { ALL_FEATURES } from './context/FeaturesContext'
 import BottomNav from './components/BottomNav'
 import PauseButton from './components/PauseButton'
 import GroundingOverlay from './components/GroundingOverlay'
@@ -23,6 +24,15 @@ export default function App() {
   // null = still checking, false = not complete, true = complete
   const [onboardingComplete, setOnboardingComplete] = useState(null)
   const [groundingOpen,      setGroundingOpen]      = useState(false)
+  const [features,           setFeatures]           = useState(ALL_FEATURES)
+
+  const loadFeatures = useCallback(async () => {
+    try {
+      const rec = await db.settings.where('key').equals('features_enabled').first()
+      if (rec?.value) setFeatures(JSON.parse(rec.value))
+      else            setFeatures(ALL_FEATURES)
+    } catch { setFeatures(ALL_FEATURES) }
+  }, [])
 
   // Install prompt (Android/Chrome)
   const { canInstall, promptInstall } = useInstallPrompt()
@@ -63,6 +73,8 @@ export default function App() {
       .catch(() => setOnboardingComplete(false))
   }, [])
 
+  useEffect(() => { loadFeatures() }, [loadFeatures])
+
   // Show iOS guide once, 1.5 s after onboarding completes
   function handleOnboardingComplete() {
     setOnboardingComplete(true)
@@ -79,11 +91,16 @@ export default function App() {
   }
 
   return (
+    <FeaturesContext.Provider value={{ features, refresh: loadFeatures }}>
     <>
       <Routes>
         {/* Full-screen ritual — no nav, no pause button */}
         <Route path="/evening"       element={<EveningRitualScreen />} />
-        <Route path="/figure-it-out" element={<FigureItOutScreen />}  />
+        <Route path="/figure-it-out" element={
+          features.includes('figure_it_out')
+            ? <FigureItOutScreen />
+            : <Navigate to="/home" replace />
+        } />
 
         {/* Main app shell with nav */}
         <Route path="*" element={
@@ -119,5 +136,6 @@ export default function App() {
         <IOSInstallSheet onClose={() => setShowIOSSheet(false)} />
       )}
     </>
+    </FeaturesContext.Provider>
   )
 }

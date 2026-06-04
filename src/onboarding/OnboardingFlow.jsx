@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import db from '../db/db'
 import { applyTheme } from '../hooks/useTheme'
+import { ALL_FEATURES } from '../context/FeaturesContext'
 import Step1Welcome from './Step1Welcome'
 import Step2Privacy from './Step2Privacy'
 import Step3Theme from './Step3Theme'
 import Step4NorthStar from './Step4NorthStar'
 import Step5Notifications from './Step5Notifications'
-import Step6Ready from './Step6Ready'
+import Step6Features from './Step6Features'
+import Step7Ready from './Step6Ready'
 
 async function upsertSetting(key, value) {
   const existing = await db.settings.where('key').equals(key).first()
@@ -25,6 +27,7 @@ export default function OnboardingFlow({ onComplete }) {
   const [morningTime, setMorningTime] = useState('08:00')
   const [eveningTime, setEveningTime] = useState('20:00')
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
+  const [features, setFeatures] = useState(ALL_FEATURES)
 
   const next = () => setStep(s => s + 1)
 
@@ -33,11 +36,18 @@ export default function OnboardingFlow({ onComplete }) {
     applyTheme(t)
   }
 
+  function handleToggleFeature(id) {
+    setFeatures(prev =>
+      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+    )
+  }
+
   async function handleComplete() {
     await upsertSetting('theme', theme)
     await upsertSetting('onboarding_complete', true)
     await upsertSetting('install_date', new Date().toISOString())
     await upsertSetting('onboarding_day', 1)
+    await upsertSetting('features_enabled', JSON.stringify(features))
 
     if (notificationsEnabled) {
       await upsertSetting('notifications_enabled', true)
@@ -46,7 +56,6 @@ export default function OnboardingFlow({ onComplete }) {
     }
 
     if (northStar.trim()) {
-      // north_star is a single-record table — put with id 1 upserts it
       await db.north_star.put({ id: 1, text: northStar.trim() })
     }
 
@@ -59,6 +68,7 @@ export default function OnboardingFlow({ onComplete }) {
     morningTime, setMorningTime,
     eveningTime, setEveningTime,
     notificationsEnabled, setNotificationsEnabled,
+    features, onToggleFeature: handleToggleFeature,
     onThemeSelect: handleThemeSelect,
     onComplete: handleComplete,
     next,
@@ -70,13 +80,14 @@ export default function OnboardingFlow({ onComplete }) {
     Step3Theme,
     Step4NorthStar,
     Step5Notifications,
-    Step6Ready,
+    Step6Features,
+    Step7Ready,
   ]
 
   const StepComponent = STEPS[step - 1]
 
-  // Show back on steps 2–5 (not Welcome or Ready)
-  const showBack = step > 1 && step < 6
+  // Show back on steps 2–6 (not Welcome or Ready)
+  const showBack = step > 1 && step < 7
 
   return (
     <div className="onboarding">
