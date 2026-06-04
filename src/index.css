@@ -4260,28 +4260,24 @@ body.room-open .bottom-nav { display: none !important; }
 ══════════════════════════════════════════════════════ */
 
 .done-character {
-  display: none;          /* invisible in minimal */
+  display:        block;
   pointer-events: none;
-  position: absolute;
-  bottom: 8px;
-  right: 10px;
-  width: auto;
-  height: 64px;           /* default — Three Things card */
-}
-
-[data-theme="playful"] .done-character {
-  display: block;
-  animation: character-spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  position:       absolute;
+  bottom:         8px;
+  right:          10px;
+  width:          auto;
+  height:         72px;           /* Three Things card */
+  animation:      character-spring-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* Spark done — slightly smaller */
-[data-theme="playful"] .spark-card--done .done-character {
-  height: 56px;
+.spark-card--done .done-character {
+  height: 60px;
 }
 
 /* Evening card is short — scale the character down to fit */
-[data-theme="playful"] .evening-card--done .done-character {
-  height: 36px;
+.evening-card--done .done-character {
+  height: 40px;
   bottom: 6px;
 }
 
@@ -4290,15 +4286,14 @@ body.room-open .bottom-nav { display: none !important; }
   to   { opacity: 1; transform: scale(1)   translateY(0);    }
 }
 
-/* Give the three-things ack message a right gutter so it
-   never slides under the character in playful mode */
-[data-theme="playful"] .three-things-ack {
-  padding-right: 60px;
+/* Give the three-things ack message and spark done-text a right gutter
+   so the text never slides under the character */
+.three-things-ack {
+  padding-right: 68px;
 }
 
-/* Give the spark done-text the same right gutter */
-[data-theme="playful"] .spark-card__done-text {
-  padding-right: 60px;
+.spark-card__done-text {
+  padding-right: 68px;
 }
 
 /* ══════════════════════════════════════════════════════
