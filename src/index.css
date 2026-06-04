@@ -6130,6 +6130,71 @@ body.room-open .bottom-nav { display: none !important; }
   text-transform: lowercase;
 }
 
+/* ── Pre-start duration picker ───────────────────────── */
+
+.ground-prestart {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            28px;
+}
+
+.ground-prestart__label {
+  font-size:      0.75rem;
+  font-weight:    500;
+  color:          rgba(239, 228, 205, 0.45);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ground-prestart__chips {
+  display: flex;
+  gap:     10px;
+}
+
+.ground-prestart__chip {
+  padding:        9px 18px;
+  border-radius:  999px;
+  border:         1.5px solid rgba(239, 228, 205, 0.18);
+  background:     transparent;
+  color:          rgba(239, 228, 205, 0.45);
+  font-size:      0.9375rem;
+  font-weight:    500;
+  cursor:         pointer;
+  font-family:    var(--font-sans);
+  transition:     border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ground-prestart__chip--active {
+  border-color: rgba(239, 228, 205, 0.6);
+  color:        rgba(239, 228, 205, 0.92);
+  background:   rgba(239, 228, 205, 0.1);
+}
+
+.ground-prestart__chip:active {
+  background: rgba(239, 228, 205, 0.14);
+}
+
+.ground-prestart__begin {
+  padding:        13px 48px;
+  border-radius:  999px;
+  border:         1.5px solid rgba(239, 228, 205, 0.28);
+  background:     rgba(239, 228, 205, 0.1);
+  color:          rgba(239, 228, 205, 0.88);
+  font-size:      1rem;
+  font-weight:    500;
+  font-family:    var(--font-sans);
+  letter-spacing: 0.01em;
+  cursor:         pointer;
+  transition:     background 0.18s ease, border-color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ground-prestart__begin:active {
+  background: rgba(239, 228, 205, 0.18);
+}
+
 /* ══════════════════════════════════════════════════════
    F21 — WEEK CARTOON (icon + overlay)
 ══════════════════════════════════════════════════════ */
