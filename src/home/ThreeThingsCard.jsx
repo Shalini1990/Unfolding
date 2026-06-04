@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import { FistPumpCharacter } from '../components/DoneCharacter'
+import { FistPumpCharacter, ThinkingCharacter } from '../components/DoneCharacter'
 import PrivacyNudge from '../components/PrivacyNudge'
 
 const ACK = {
@@ -38,7 +38,8 @@ function InputMode({ onSave }) {
   const placeholders = ['Your first thing…', 'Second…', 'Third…']
 
   return (
-    <div className="home-card">
+    <div className="home-card home-card--input">
+      <ThinkingCharacter />
       <PrivacyNudge featureKey="three_things" />
       <p className="home-card__label">Three things to accomplish</p>
       <div className="three-things-inputs">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getGreeting, formatDisplayDate } from '../utils/date'
 import db from '../db/db'
+import { WavingCharacter } from '../components/DoneCharacter'
 
 // Small painting-on-easel icon with a colourful mini landscape inside
 function PaintingIcon() {
@@ -53,6 +54,7 @@ export default function GreetingHeader({ date, onEaselClick }) {
             <PaintingIcon />
           </button>
         )}
+        <WavingCharacter />
       </div>
       <p className="home-greeting__date">{formatDisplayDate(date)}</p>
     </div>

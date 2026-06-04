@@ -1,5 +1,5 @@
 import { Zap, RefreshCw } from 'lucide-react'
-import { TaDaCharacter } from '../components/DoneCharacter'
+import { TaDaCharacter, CuriousCharacter } from '../components/DoneCharacter'
 
 const TYPE_LABELS = {
   novelty:  'Novelty',
@@ -26,6 +26,7 @@ export default function SparkCard({ spark, animationKey, onDone, onSkip, onShuff
 
   return (
     <div className="spark-card">
+      <CuriousCharacter />
       <div className="spark-card__header">
         <p className="spark-card__eyebrow">
           <Zap size={11} strokeWidth={2.5} aria-hidden="true" />

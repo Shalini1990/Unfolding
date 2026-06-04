@@ -4260,23 +4260,27 @@ body.room-open .bottom-nav { display: none !important; }
 ══════════════════════════════════════════════════════ */
 
 .done-character {
-  display:        block;
+  display:        none;           /* hidden in minimal */
   pointer-events: none;
   position:       absolute;
   bottom:         8px;
   right:          10px;
   width:          auto;
-  height:         72px;           /* Three Things card */
-  animation:      character-spring-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  height:         72px;
+}
+
+[data-theme="playful"] .done-character {
+  display:   block;
+  animation: character-spring-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 /* Spark done — slightly smaller */
-.spark-card--done .done-character {
+[data-theme="playful"] .spark-card--done .done-character {
   height: 60px;
 }
 
-/* Evening card is short — scale the character down to fit */
-.evening-card--done .done-character {
+/* Evening card is short */
+[data-theme="playful"] .evening-card--done .done-character {
   height: 40px;
   bottom: 6px;
 }
@@ -4286,13 +4290,81 @@ body.room-open .bottom-nav { display: none !important; }
   to   { opacity: 1; transform: scale(1)   translateY(0);    }
 }
 
-/* Give the three-things ack message and spark done-text a right gutter
-   so the text never slides under the character */
-.three-things-ack {
-  padding-right: 68px;
+/* Give the three-things ack message a right gutter so it
+   never slides under the character in playful mode */
+[data-theme="playful"] .three-things-ack {
+  padding-right: 60px;
 }
 
-.spark-card__done-text {
+/* Give the spark done-text the same right gutter */
+[data-theme="playful"] .spark-card__done-text {
+  padding-right: 60px;
+}
+
+/* ── Ambient characters (always visible in playful) ─── */
+
+.ambient-character {
+  display:        none;           /* hidden in minimal */
+  pointer-events: none;
+  position:       absolute;
+  width:          auto;
+}
+
+[data-theme="playful"] .ambient-character {
+  display:   block;
+  animation: character-spring-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Waving — sits in the h1-row as a flex item (not absolute) */
+.ambient-character--wave {
+  position: static;
+  height:   48px;
+  flex-shrink: 0;
+}
+
+/* Thinking — top-right of the input card */
+.ambient-character--think {
+  top:    14px;
+  right:  10px;
+  height: 64px;
+}
+
+/* Stargazing — bottom-right of the north star wrapper */
+.ambient-character--star {
+  bottom: -10px;
+  right:  2px;
+  height: 52px;
+}
+
+/* Curious — top-right of the pending spark card */
+.ambient-character--curious {
+  top:    10px;
+  right:  8px;
+  height: 60px;
+}
+
+/* The north-star wrapper needs relative positioning */
+.home-north-star-wrap {
+  position: relative;
+}
+
+[data-theme="playful"] .home-north-star-wrap .home-north-star {
+  padding-right: 56px;   /* keep text clear of the stargazing character */
+}
+
+/* Containers that need relative positioning for new characters */
+.home-card--input {
+  position: relative;
+  overflow: hidden;
+}
+
+.spark-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Right-gutter so spark text never hides under the curious character */
+[data-theme="playful"] .spark-card .spark-card__text {
   padding-right: 68px;
 }
 
