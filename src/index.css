@@ -2027,12 +2027,6 @@ body.room-open .bottom-nav { display: none !important; }
 
 /* ── Greeting header ──────────────────────────────── */
 
-.home-greeting__h1-row {
-  display:     flex;
-  align-items: center;
-  gap:         10px;
-}
-
 .home-greeting__text {
   font-size: 28px;
   font-weight: 700;
@@ -6064,29 +6058,43 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 /* ══════════════════════════════════════════════════════
-   F21 — WEEK CARTOON (icon + overlay)
+   F21 — WEEK CARTOON (inline card + overlay)
 ══════════════════════════════════════════════════════ */
 
-.wc-icon-btn {
-  flex-shrink:     0;
-  width:           44px;
-  height:          44px;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  border:          none;
-  background:      transparent;
-  color:           var(--color-text);
-  opacity:         0.68;
-  cursor:          pointer;
-  border-radius:   50%;
-  transition:      opacity 0.2s ease, background 0.15s ease;
-  padding:         0;
+/* ── Inline card (always visible on Home screen) ───── */
+
+.wc-card {
+  display:          block;
+  width:            100%;
+  background:       var(--color-surface);
+  border:           1px solid var(--color-border);
+  border-radius:    18px;
+  padding:          16px 16px 14px;
+  cursor:           pointer;
+  text-align:       left;
+  -webkit-tap-highlight-color: transparent;
+  transition:       opacity 0.15s ease, transform 0.12s ease,
+                    box-shadow 0.2s ease;
 }
 
-.wc-icon-btn:active {
-  opacity:    0.7;
-  background: var(--color-border);
+.wc-card:active {
+  opacity:   0.82;
+  transform: scale(0.985);
+}
+
+.wc-card__label {
+  font-size:      11px;
+  font-weight:    600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color:          var(--color-muted);
+  margin-bottom:  12px;
+}
+
+[data-theme="playful"] .wc-card {
+  border-radius: 22px;
+  border-width:  2px;
+  box-shadow:    0 4px 18px rgba(217, 119, 6, 0.10);
 }
 
 .wc-overlay {

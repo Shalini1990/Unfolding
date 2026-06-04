@@ -1,13 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import db from '../db/db'
 import { getWeekStart, getDayOfWeek, getTodayDate } from '../utils/date'
-import { useTheme } from '../hooks/useTheme'
 import { CARTOONS, pickWeekColors, pickCartoon } from '../data/cartoons'
 
 const FILL_DURATION  = 5      // seconds — how long today's colour seeps in
 const FILL_START     = 200    // ms — delay before fill begins
-const DISMISS_ANIM   = FILL_START + FILL_DURATION * 1000  // 5200ms
-const DISMISS_STATIC = 5000   // ms — manual open (unchanged)
+const DISMISS_ANIM   = FILL_START + FILL_DURATION * 1000  // 5200 ms
+const DISMISS_STATIC = 5000   // ms — manual open
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -40,15 +39,12 @@ function DayDots({ partitions, colors, todayIdx, animateIdx, animateDuration }) 
   )
 }
 
-// ── Single SVG element (partition or base layer) ─────────────────
-// fillDuration: CSS transition duration in seconds for the fill property
+// ── Single SVG element ────────────────────────────────────────────
 function SvgEl({ def, filled, color, isBase, fillDuration = 0.7 }) {
   const { type, ...attrs } = def
   const El = type
 
   let fill, stroke, strokeWidth
-  const strokeLinecap = 'round'
-
   if (isBase) {
     fill        = 'none'
     stroke      = 'var(--color-border)'
@@ -58,7 +54,7 @@ function SvgEl({ def, filled, color, isBase, fillDuration = 0.7 }) {
     stroke      = 'none'
     strokeWidth = 0
   } else {
-    fill        = 'transparent'   // 'none' can't be interpolated; transparent → colour transitions smoothly
+    fill        = 'transparent'
     stroke      = 'var(--color-border)'
     strokeWidth = 1.5
   }
@@ -70,7 +66,7 @@ function SvgEl({ def, filled, color, isBase, fillDuration = 0.7 }) {
         fill,
         stroke,
         strokeWidth,
-        strokeLinecap,
+        strokeLinecap:  'round',
         strokeLinejoin: 'round',
         transition: `fill ${fillDuration}s cubic-bezier(0.4,0,0.2,1), stroke 0.4s ease`,
       }}
@@ -78,11 +74,9 @@ function SvgEl({ def, filled, color, isBase, fillDuration = 0.7 }) {
   )
 }
 
-// ── SVG cartoon with 7 colourable partitions ─────────────────────
-// animateIdx: partition index that uses the slow fill (today's day), or null
-function SVGCartoon({ cartoonId, partitions, colors, isMinimal, animateIdx }) {
+// ── SVG cartoon ───────────────────────────────────────────────────
+function SVGCartoon({ cartoonId, partitions, colors, animateIdx }) {
   const design = CARTOONS[cartoonId] ?? CARTOONS[0]
-
   return (
     <svg
       viewBox={design.viewBox}
@@ -106,14 +100,13 @@ function SVGCartoon({ cartoonId, partitions, colors, isMinimal, animateIdx }) {
   )
 }
 
-// ── Overlay (controlled by parent) ───────────────────────────────
-function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal, onClose, animate }) {
+// ── Full-screen overlay (opened on tap or auto-show) ──────────────
+function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, onClose, animate }) {
   const dismissDelay = animate ? DISMISS_ANIM : DISMISS_STATIC
 
   const [exiting,      setExiting]      = useState(false)
   const [visibleParts, setVisibleParts] = useState(() => {
     if (!animate) return partitions
-    // All previous days pre-filled — only today starts empty and animates in
     const initial = [...partitions]
     initial[todayIdx] = false
     return initial
@@ -127,14 +120,13 @@ function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal
     setTimeout(onClose, 350)
   }
 
-  // Auto-dismiss after dismissDelay
+  // Auto-dismiss
   useEffect(() => {
     timerRef.current = setTimeout(dismiss, dismissDelay)
     return () => clearTimeout(timerRef.current)
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Trigger today's fill after FILL_START ms — transition carries it to completion
-  // exactly when the progress bar drains to zero
+  // Trigger today's fill after FILL_START ms
   useEffect(() => {
     if (!animate || !partitions[todayIdx]) return
     const t = setTimeout(() => {
@@ -159,7 +151,6 @@ function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal
           cartoonId={cartoonId}
           partitions={visibleParts}
           colors={colors}
-          isMinimal={isMinimal}
           animateIdx={animate ? todayIdx : null}
         />
 
@@ -185,18 +176,14 @@ function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal
   )
 }
 
-// ── Root — data loader + overlay renderer ─────────────────────────
-// Props:
-//   show       — whether to show the overlay (controlled by parent)
-//   onClose    — called when overlay is dismissed
-//   onAutoShow — called once per day when the overlay should auto-appear
-export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
+// ── Root: inline card + overlay manager ──────────────────────────
+// No props needed — self-contained data loading + state.
+export default function WeekCartoonCard() {
   const [partitions,  setPartitions]  = useState(null)
   const [colors,      setColors]      = useState(null)
   const [cartoonId,   setCartoonId]   = useState(0)
+  const [showOverlay, setShowOverlay] = useState(false)
   const [isAutoShow,  setIsAutoShow]  = useState(false)
-  const { theme } = useTheme()
-  const isMinimal = theme !== 'playful'
 
   const weekStart = getWeekStart()
   const todayIdx  = getDayOfWeek()
@@ -213,7 +200,6 @@ export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
         const weekColors = pickWeekColors()
         const states     = Array(7).fill(false)
         for (let i = 0; i <= todayIdx; i++) states[i] = true
-
         const id = await db.week_cartoons.add({
           weekStart,
           cartoon_id:       cid,
@@ -221,7 +207,6 @@ export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
           colors:           weekColors,
         })
         rec = { id, weekStart, cartoon_id: cid, partition_states: states, colors: weekColors }
-
       } else if (!rec.partition_states[todayIdx]) {
         const states = [...rec.partition_states]
         states[todayIdx] = true
@@ -230,8 +215,7 @@ export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
       }
 
       // Backwards-compat: old records without colours or cartoon_id
-      const needsPatch = !rec.colors || rec.cartoon_id == null
-      if (needsPatch) {
+      if (!rec.colors || rec.cartoon_id == null) {
         const patch = {}
         if (!rec.colors)            patch.colors      = pickWeekColors()
         if (rec.cartoon_id == null) patch.cartoon_id  = pickCartoon(-1)
@@ -243,29 +227,60 @@ export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
       setColors(rec.colors)
       setCartoonId(rec.cartoon_id)
 
-      // Trigger auto-show once per day — mark as animate-worthy
+      // Auto-show the full overlay once per calendar day
       const lastSeen = localStorage.getItem('wc_last_shown')
       if (lastSeen !== today) {
         localStorage.setItem('wc_last_shown', today)
         setIsAutoShow(true)
-        setTimeout(() => onAutoShow?.(), 500)
+        setTimeout(() => setShowOverlay(true), 500)
       }
     }
     load()
   }, [weekStart, todayIdx, today])  // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!partitions || !colors) return null
-  if (!show) return null
+
+  function handleCardTap() {
+    setIsAutoShow(false)   // manual open — no fill animation
+    setShowOverlay(true)
+  }
 
   return (
-    <WeekCartoonOverlay
-      cartoonId={cartoonId}
-      partitions={partitions}
-      colors={colors}
-      todayIdx={todayIdx}
-      isMinimal={isMinimal}
-      onClose={onClose}
-      animate={isAutoShow}
-    />
+    <>
+      {/* ── Inline card — always visible on the Home screen ── */}
+      <button
+        className="wc-card"
+        onClick={handleCardTap}
+        type="button"
+        aria-label="This week's illustration — tap to expand"
+      >
+        <p className="wc-card__label">This week</p>
+        <SVGCartoon
+          cartoonId={cartoonId}
+          partitions={partitions}
+          colors={colors}
+          animateIdx={null}
+        />
+        <DayDots
+          partitions={partitions}
+          colors={colors}
+          todayIdx={todayIdx}
+          animateIdx={null}
+          animateDuration={null}
+        />
+      </button>
+
+      {/* ── Full overlay — opens on tap or once-per-day auto ── */}
+      {showOverlay && (
+        <WeekCartoonOverlay
+          cartoonId={cartoonId}
+          partitions={partitions}
+          colors={colors}
+          todayIdx={todayIdx}
+          onClose={() => setShowOverlay(false)}
+          animate={isAutoShow}
+        />
+      )}
+    </>
   )
 }
