@@ -118,6 +118,7 @@ export default function HomeScreen() {
   const [dayNumber, setDayNumber] = useState(1)
   const [eveningDone, setEveningDone] = useState(false)
   const [sparkAnimKey, setSparkAnimKey] = useState(0)
+  const [showCartoon, setShowCartoon] = useState(false)
   const [showNotifNudge, setShowNotifNudge] = useState(false)
   const [algoState, setAlgoState] = useState(null)
 
@@ -309,13 +310,16 @@ export default function HomeScreen() {
 
   return (
     <div className="home-screen screen">
-      <GreetingHeader date={today} />
+      <WeekCartoonCard
+        show={showCartoon}
+        onClose={() => setShowCartoon(false)}
+        onAutoShow={() => setShowCartoon(true)}
+      />
+      <GreetingHeader date={today} onEaselClick={() => setShowCartoon(true)} />
 
       {showNotifNudge && (
         <NotifNudge onDismiss={() => setShowNotifNudge(false)} />
       )}
-
-      <WeekCartoonCard />
 
       <QuoteCard
         quoteState={quoteState}
