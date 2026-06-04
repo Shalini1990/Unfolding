@@ -56,15 +56,76 @@
 
 /* ── Playful theme ──────────────────────────────────── */
 [data-theme="playful"] {
-  --color-base:        #FFFBF5;
-  --color-surface:     #FFF8EE;
+  --color-base:        #FFFCEE;
+  --color-surface:     #FFF3C4;   /* noticeably golden so cards pop */
   --color-text:        #1C1917;
   --color-muted:       #78716C;
-  --color-accent:      #F59E0B;
+  --color-accent:      #D97706;   /* richer amber */
   --color-accent-soft: #FEF3C7;
-  --color-border:      #FDE68A;
+  --color-border:      #FCD34D;   /* brighter, more visible */
   --tracking:          0.01em;
   --leading:           1.75;
+}
+
+/* ── Playful theme: component overrides ─────────────────────── */
+
+/* Screen titles → Caveat (handwritten, warm, clearly different) */
+[data-theme="playful"] .home-greeting__text,
+[data-theme="playful"] .me-title,
+[data-theme="playful"] .ev-header__title,
+[data-theme="playful"] .ys-title,
+[data-theme="playful"] .settle-title {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+/* Caveat renders visually smaller than Plus Jakarta — scale up */
+[data-theme="playful"] .home-greeting__text { font-size: 38px; }
+[data-theme="playful"] .me-title            { font-size: 42px; }
+[data-theme="playful"] .ev-header__title    { font-size: 36px; }
+[data-theme="playful"] .ys-title            { font-size: 36px; }
+[data-theme="playful"] .settle-title        { font-size: 42px; }
+
+/* Onboarding titles */
+[data-theme="playful"] .ob-title {
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 36px;
+  letter-spacing: 0;
+}
+[data-theme="playful"] .ob-title--hero { font-size: 58px; }
+[data-theme="playful"] .ob-tagline {
+  font-family: 'Caveat', cursive;
+  font-size: 24px;
+}
+
+/* Cards: rounder corners + warm shadow */
+[data-theme="playful"] .home-card {
+  border-radius: 22px;
+  border-width: 2px;
+  box-shadow: 0 4px 18px rgba(217, 119, 6, 0.10);
+}
+[data-theme="playful"] .me-card {
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(217, 119, 6, 0.08);
+}
+[data-theme="playful"] .ob-theme-card { border-radius: 20px; }
+
+/* Primary buttons → pill shape */
+[data-theme="playful"] .ob-cta,
+[data-theme="playful"] .ev-save-btn,
+[data-theme="playful"] .ev-skip-btn {
+  border-radius: 999px;
+}
+
+/* Settle tabs → pill */
+[data-theme="playful"] .settle-tab {
+  border-radius: 999px;
+}
+
+/* Active nav tab label: bolder weight */
+[data-theme="playful"] .bottom-nav__tab--active span {
+  font-weight: 700;
 }
 
 /* ═══════════════════════════════════════════════════════
