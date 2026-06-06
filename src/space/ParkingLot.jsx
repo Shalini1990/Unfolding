@@ -6,7 +6,11 @@ import { relativeDate } from '../utils/date'
 import JarSVG from './JarSVG'
 import PrivacyNudge from '../components/PrivacyNudge'
 
-const TAGS = ['Low mood', 'Anger', 'Worry', 'Decision', 'Idea', 'Dream']
+const TAG_ROWS = [
+  ['Low mood', 'Worry', 'Anger'],
+  ['Decision', 'Idea', 'Dream'],
+]
+const TAGS = TAG_ROWS.flat()
 
 const SNOOZE_OPTIONS = [
   { label: 'Tomorrow',   days: 1 },
@@ -71,17 +75,21 @@ function AddMode({ thoughts, onRevisit, onPark }) {
         rows={3}
       />
 
-      {/* Tags */}
+      {/* Tags — two fixed rows */}
       <div className="parking-tags">
-        {TAGS.map(t => (
-          <button
-            key={t}
-            className={`parking-tag${selectedTag === t ? ' parking-tag--selected' : ''}`}
-            onClick={() => setSelectedTag(prev => prev === t ? null : t)}
-            type="button"
-          >
-            {t}
-          </button>
+        {TAG_ROWS.map((row, ri) => (
+          <div key={ri} className="parking-tags__row">
+            {row.map(t => (
+              <button
+                key={t}
+                className={`parking-tag${selectedTag === t ? ' parking-tag--selected' : ''}`}
+                onClick={() => setSelectedTag(prev => prev === t ? null : t)}
+                type="button"
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         ))}
       </div>
 

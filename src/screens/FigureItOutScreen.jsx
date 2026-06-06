@@ -335,7 +335,7 @@ export default function FigureItOutScreen() {
           <ArrowLeft size={18} strokeWidth={2} /> Back
         </button>
 
-        <h1 className="figureout-title">Let's figure it out.</h1>
+        <h1 className="figureout-title" data-tour="figure-it-out">Let's figure it out.</h1>
 
         {thought && (
           <div className="figureout-context">

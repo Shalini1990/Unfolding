@@ -14,7 +14,7 @@ import {
   loadNotifSettings,
   saveNotifSettings,
 } from '../utils/notifications'
-import { useFeatures, FEATURE_META } from '../context/FeaturesContext'
+import { useFeatures, FEATURE_META, applyFeatureLinkage } from '../context/FeaturesContext'
 
 // ── Accent presets (matches CSS vars in index.css) ─────────────
 export const ACCENTS = [
@@ -72,6 +72,31 @@ function Section({ icon: Icon, title, count, emptyMsg, children }) {
   )
 }
 
+// ── Collapsible settings card ──────────────────────────────────
+function CollapsibleCard({ icon: Icon, title, children, extraClass = '' }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className={`me-card${extraClass ? ` ${extraClass}` : ''}`}>
+      <button
+        className="me-section-hd"
+        onClick={() => setOpen(v => !v)}
+        type="button"
+      >
+        <div className="me-card__label">
+          <Icon size={14} strokeWidth={2.2} className="me-icon" />
+          {title}
+        </div>
+        <ChevronDown
+          size={15}
+          strokeWidth={2.2}
+          className={`me-chevron${open ? ' me-chevron--open' : ''}`}
+        />
+      </button>
+      {open && <div className="me-section-body">{children}</div>}
+    </div>
+  )
+}
+
 // ── North Star card ────────────────────────────────────────────
 function NorthStarCard() {
   const [text,    setText]    = useState(null)   // null = loading
@@ -101,23 +126,14 @@ function NorthStarCard() {
   if (text === null) return null
 
   return (
-    <div className="me-card">
-      <div className="me-card__hd">
-        <div className="me-card__label">
-          <Star size={14} strokeWidth={2.2} className="me-icon me-icon--star" />
-          North Star
-        </div>
-        {!editing && (
-          <button
-            className="me-edit-btn"
-            onClick={startEdit}
-            type="button"
-            aria-label="Edit North Star"
-          >
+    <CollapsibleCard icon={Star} title="My One Thing">
+      {!editing && (
+        <div className="me-section-body-hd">
+          <button className="me-edit-btn" onClick={startEdit} type="button" aria-label="Edit My One Thing">
             <Edit2 size={13} strokeWidth={2} />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {editing ? (
         <>
@@ -152,10 +168,10 @@ function NorthStarCard() {
         <p className="me-ns-text">"{text}"</p>
       ) : (
         <button className="me-ns-empty" onClick={startEdit} type="button">
-          Add your north star — what matters most to you right now?
+          What do you want to come back to, every day?
         </button>
       )}
-    </div>
+    </CollapsibleCard>
   )
 }
 
@@ -518,14 +534,7 @@ function AppFeel({ theme, switchTheme }) {
   }
 
   return (
-    <div className="me-card">
-      <div className="me-card__hd">
-        <div className="me-card__label">
-          <Palette size={14} strokeWidth={2.2} className="me-icon" />
-          App feel
-        </div>
-      </div>
-
+    <CollapsibleCard icon={Palette} title="App feel">
       <div className="me-theme-row">
         {['minimal', 'playful'].map(t => (
           <button
@@ -552,7 +561,7 @@ function AppFeel({ theme, switchTheme }) {
           />
         ))}
       </div>
-    </div>
+    </CollapsibleCard>
   )
 }
 
@@ -606,17 +615,12 @@ function NotificationsCard() {
   const isDenied    = permission === 'denied'
   const isGranted   = permission === 'granted'
 
+  const BellIcon = enabled && isGranted ? Bell : BellOff
+
   return (
-    <div className="me-card">
-      <div className="me-card__hd">
-        <div className="me-card__label">
-          {enabled && isGranted
-            ? <Bell    size={14} strokeWidth={2.2} className="me-icon" />
-            : <BellOff size={14} strokeWidth={2.2} className="me-icon" />
-          }
-          Notifications
-        </div>
-        {isGranted && (
+    <CollapsibleCard icon={BellIcon} title="Notifications">
+      {isGranted && (
+        <div className="me-section-body-hd">
           <button
             className={`me-notif-toggle${enabled ? ' me-notif-toggle--on' : ''}`}
             onClick={handleToggle}
@@ -625,8 +629,8 @@ function NotificationsCard() {
           >
             <span className="me-notif-toggle__thumb" />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {!isSupported && (
         <p className="me-notif-unsupported">
@@ -698,7 +702,7 @@ function NotificationsCard() {
           )}
         </>
       )}
-    </div>
+    </CollapsibleCard>
   )
 }
 
@@ -728,7 +732,7 @@ async function buildExportText() {
 
   // North Star
   lines.push(hr)
-  lines.push('North Star')
+  lines.push('My One Thing')
   lines.push(hr)
   if (northStar[0]?.text) lines.push(northStar[0].text)
   else lines.push('(not set)')
@@ -868,14 +872,7 @@ function PrivacySection() {
   })()
 
   return (
-    <div className="me-card me-card--privacy">
-      <div className="me-card__hd">
-        <div className="me-card__label">
-          <Shield size={14} strokeWidth={2.2} className="me-icon" />
-          Your Privacy
-        </div>
-      </div>
-
+    <CollapsibleCard icon={Shield} title="Your Privacy" extraClass="me-card--privacy">
       {/* Where data lives */}
       <div className="me-privacy-where">
         <HardDrive size={13} strokeWidth={2} className="me-privacy-where__icon" aria-hidden="true" />
@@ -934,7 +931,7 @@ function PrivacySection() {
         ) : deleteMode === 'confirm' ? (
           <div className="me-clear-confirm me-clear-confirm--danger">
             <p className="me-clear-confirm__text">
-              Delete <strong>all</strong> your entries, intentions, reflections, and north star? This cannot be undone.
+              Delete <strong>all</strong> your entries, intentions, reflections, and your one thing? This cannot be undone.
             </p>
             <div className="me-clear-confirm__row">
               <button className="me-clear-confirm__yes" onClick={deleteAllData} type="button">
@@ -952,18 +949,35 @@ function PrivacySection() {
           </button>
         )}
       </div>
-    </div>
+    </CollapsibleCard>
   )
+}
+
+// Features that require 'space' to be enabled first
+const SPACE_DEPS = new Set(['kind_words', 'figure_it_out'])
+
+const SPACE_DEP_LABELS = {
+  kind_words:    'Kind words',
+  figure_it_out: "Let's figure it out",
 }
 
 // ── Features card ──────────────────────────────────────────────
 function FeaturesCard() {
   const { features, refresh } = useFeatures()
+  const [nudge, setNudge] = useState(null)
 
   async function toggle(id) {
-    const next = features.includes(id)
+    // If trying to enable a space-dependent feature while space is off, nudge instead
+    if (SPACE_DEPS.has(id) && !features.includes(id) && !features.includes('space')) {
+      setNudge(id)
+      setTimeout(() => setNudge(null), 3000)
+      return
+    }
+
+    const raw  = features.includes(id)
       ? features.filter(f => f !== id)
       : [...features, id]
+    const next = applyFeatureLinkage(raw)
     const existing = await db.settings.where('key').equals('features_enabled').first()
     if (existing) await db.settings.update(existing.id, { value: JSON.stringify(next) })
     else          await db.settings.add({ key: 'features_enabled', value: JSON.stringify(next) })
@@ -971,11 +985,7 @@ function FeaturesCard() {
   }
 
   return (
-    <div className="me-card">
-      <div className="me-card__label">
-        <LayoutGrid size={14} strokeWidth={2.2} className="me-icon" />
-        Features
-      </div>
+    <CollapsibleCard icon={LayoutGrid} title="Features">
       <div className="me-features-list">
         {FEATURE_META.map(f => {
           const on = features.includes(f.id)
@@ -997,7 +1007,12 @@ function FeaturesCard() {
           )
         })}
       </div>
-    </div>
+      {nudge && (
+        <p className="me-feature-nudge">
+          {SPACE_DEP_LABELS[nudge]} lives inside Your space — enable Your space first.
+        </p>
+      )}
+    </CollapsibleCard>
   )
 }
 

@@ -1,11 +1,11 @@
 @import "tailwindcss";
-@import "@fontsource/plus-jakarta-sans/400.css";
-@import "@fontsource/plus-jakarta-sans/500.css";
-@import "@fontsource/plus-jakarta-sans/600.css";
-@import "@fontsource/plus-jakarta-sans/700.css";
+@import "@fontsource/nunito/400.css";
+@import "@fontsource/nunito/500.css";
+@import "@fontsource/nunito/600.css";
+@import "@fontsource/nunito/700.css";
 @import "@fontsource/caveat/500.css";
+@import "@fontsource/caveat/600.css";
 @import "@fontsource/caveat/700.css";
-@import "@fontsource/kalam/400.css";
 
 /* ═══════════════════════════════════════════════════════
    THEME SYSTEM
@@ -45,9 +45,26 @@
   --accent-rose:   #BE8A9D;
 
   /* Typography */
-  --font-sans:   'Plus Jakarta Sans', sans-serif;
+  --font-sans:    'Nunito', sans-serif;
+  --font-heading: 'Nunito', sans-serif;
   --tracking:    -0.01em;
   --leading:     1.6;
+
+  /* ── Type scale ─────────────────────────────────────
+     6 levels. All heading/label classes use these vars.
+     --fs-title   Screen headings (Good morning, Settle…)
+     --fs-heading Card labels, section titles
+     --fs-body    Body text, inputs, descriptions
+     --fs-small   Secondary / helper text
+     --fs-label   Uppercase eyebrows, tags, counts
+     --fs-micro   Timestamps, footnotes
+  ────────────────────────────────────────────────── */
+  --fs-title:   26px;
+  --fs-heading: 17px;
+  --fs-body:    15px;
+  --fs-small:   13px;
+  --fs-label:   11px;
+  --fs-micro:   10px;
 
   /* Layout */
   --nav-height:  64px;
@@ -57,47 +74,78 @@
 /* ── Playful theme ──────────────────────────────────── */
 [data-theme="playful"] {
   --color-base:        #FFFCEE;
-  --color-surface:     #FFF3C4;   /* noticeably golden so cards pop */
+  --color-surface:     #FFF3C4;
   --color-text:        #1C1917;
   --color-muted:       #78716C;
-  --color-accent:      #D97706;   /* richer amber */
+  --color-accent:      #D97706;
   --color-accent-soft: #FEF3C7;
-  --color-border:      #FCD34D;   /* brighter, more visible */
-  --tracking:          0.01em;
-  --leading:           1.75;
+  --color-border:      #FCD34D;
+  --tracking:          0.02em;
+  --leading:           1.8;
+
+  /* Caveat for headings only — Nunito for body text */
+  --font-sans:    'Nunito', sans-serif;
+  --font-heading: 'Caveat', cursive;
+
+  /* Caveat renders ~25% smaller visually — heading sizes scaled up */
+  --fs-title:   34px;
+  --fs-heading: 23px;
+  --fs-body:    15px;
+  --fs-small:   13px;
+  --fs-label:   11px;
+  --fs-micro:   10px;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL TYPOGRAPHY
+   --font-heading resolves to Plus Jakarta Sans (Minimal) or
+   Fredoka (Playful) — set in the theme variables above.
+   No italic anywhere in the UI.
+══════════════════════════════════════════════════════════════ */
+
+/* ── Screen titles — all at --fs-title ───────────────── */
+.home-greeting__text,
+.me-title,
+.ev-header__title,
+.ys-title,
+.settle-title,
+.figureout-title,
+.ob-title {
+  font-family:  var(--font-heading);
+  font-size:    var(--fs-title);
+  font-weight:  700;
+  font-style:   normal;
+  letter-spacing: 0;
+  line-height:  1.2;
+}
+
+/* ── Card / section headings — all at --fs-heading ───── */
+.home-card__label,
+.kw-header__title,
+.spark-card__eyebrow,
+.tomorrow-card__eyebrow,
+.evening-card__label,
+.ev-header__eyebrow,
+.ev-divider__label,
+.ev-spark-checkin__label,
+.me-card__label,
+.wc-overlay__label,
+.frg-title,
+.three-things-collapsed__label,
+.figureout-privacy__title,
+.ys-door__title {
+  font-family:  var(--font-heading);
+  font-size:    var(--fs-heading);
+  font-weight:  700;
+  font-style:   normal;
+  letter-spacing: 0;
+}
+
+/* ── Onboarding hero ─────────────────────────────────── */
+.ob-title--hero { font-family: var(--font-heading); font-size: calc(var(--fs-title) * 1.5); font-style: normal; font-weight: 700; }
+.ob-tagline     { font-family: var(--font-heading); font-size: var(--fs-body);              font-style: normal; font-weight: 600; }
 
 /* ── Playful theme: component overrides ─────────────────────── */
-
-/* Screen titles → Caveat (handwritten, warm, clearly different) */
-[data-theme="playful"] .home-greeting__text,
-[data-theme="playful"] .me-title,
-[data-theme="playful"] .ev-header__title,
-[data-theme="playful"] .ys-title,
-[data-theme="playful"] .settle-title {
-  font-family: 'Caveat', cursive;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-/* Caveat renders visually smaller than Plus Jakarta — scale up */
-[data-theme="playful"] .home-greeting__text { font-size: 38px; }
-[data-theme="playful"] .me-title            { font-size: 42px; }
-[data-theme="playful"] .ev-header__title    { font-size: 36px; }
-[data-theme="playful"] .ys-title            { font-size: 36px; }
-[data-theme="playful"] .settle-title        { font-size: 42px; }
-
-/* Onboarding titles */
-[data-theme="playful"] .ob-title {
-  font-family: 'Caveat', cursive;
-  font-weight: 700;
-  font-size: 36px;
-  letter-spacing: 0;
-}
-[data-theme="playful"] .ob-title--hero { font-size: 58px; }
-[data-theme="playful"] .ob-tagline {
-  font-family: 'Caveat', cursive;
-  font-size: 24px;
-}
 
 /* Cards: rounder corners + warm shadow */
 [data-theme="playful"] .home-card {
@@ -144,6 +192,7 @@ html, body, #root {
 
 body {
   font-family: var(--font-sans);
+  font-size:   var(--fs-body);
   background-color: var(--color-base);
   color: var(--color-text);
   letter-spacing: var(--tracking);
@@ -198,7 +247,7 @@ body {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-accent);
   margin-bottom: 8px;
 }
@@ -230,7 +279,7 @@ body {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   margin-bottom: 6px;
 }
@@ -245,7 +294,8 @@ body {
 ═══════════════════════════════════════════════════════ */
 
 /* Hidden when a fullscreen overlay (TheRoom) is open */
-body.room-open .bottom-nav { display: none !important; }
+body.room-open .bottom-nav   { display: none !important; }
+body.room-open .pause-button { display: none !important; }
 
 .bottom-nav {
   position: fixed;
@@ -351,7 +401,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   margin-bottom: 12px;
 }
@@ -412,17 +462,13 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   margin-bottom: 2px;
 }
 
 .me-title {
-  font-size: 1.875rem;
-  font-weight: 700;
   color: var(--color-text);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
 }
 
 /* ── Card shell ──────────────────────────────────────── */
@@ -446,10 +492,7 @@ body.room-open .bottom-nav { display: none !important; }
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 0.8125rem;
-  font-weight: 600;
   color: var(--color-text);
-  letter-spacing: -0.01em;
 }
 
 .me-icon {
@@ -474,6 +517,17 @@ body.room-open .bottom-nav { display: none !important; }
 .me-chevron {
   color: var(--color-muted);
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.me-chevron--open {
+  transform: rotate(180deg);
+}
+
+/* Small header row inside an open section body (e.g. edit button) */
+.me-section-body-hd {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
 }
 
 .me-edit-btn {
@@ -539,7 +593,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 0.9375rem;
   font-weight: 400;
   color: var(--color-text);
-  font-style: italic;
+
   line-height: 1.55;
 }
 
@@ -712,7 +766,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.07em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   margin-bottom: 3px;
 }
@@ -789,7 +843,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.07em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   margin-top: 4px;
   margin-bottom: -4px;
@@ -828,6 +882,22 @@ body.room-open .bottom-nav { display: none !important; }
   flex-direction: column;
   gap: 8px;
   margin-top: 14px;
+}
+
+.me-feature-nudge {
+  font-size:     12px;
+  color:         var(--color-accent);
+  background:    var(--color-accent-soft);
+  border-radius: 8px;
+  padding:       8px 12px;
+  margin-top:    4px;
+  line-height:   1.5;
+  animation:     feature-nudge-in 0.2s ease both;
+}
+
+@keyframes feature-nudge-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .me-feature-row {
@@ -962,7 +1032,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.07em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
 }
 
@@ -1034,7 +1104,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.07em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   min-width: 36px;
 }
@@ -1531,31 +1601,25 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .ob-footer {
-  padding: 20px 0 52px;
+  position: sticky;
+  bottom: 0;
+  background: var(--color-base);
+  padding: 16px 0 calc(28px + env(safe-area-inset-bottom, 16px));
   display: flex;
   flex-direction: column;
   gap: 6px;
+  transition: background-color 0.25s ease;
 }
 
 /* ── Typography ───────────────────────────────────── */
 
 .ob-title {
-  font-size: 26px;
-  font-weight: 700;
   color: var(--color-text);
-  line-height: 1.2;
   margin-bottom: 10px;
 }
 
-.ob-title--hero {
-  font-size: 44px;
-  letter-spacing: -0.025em;
-}
-
 .ob-tagline {
-  font-size: 18px;
   color: var(--color-muted);
-  font-style: italic;
   line-height: 1.5;
   margin-top: 4px;
 }
@@ -1586,6 +1650,25 @@ body.room-open .bottom-nav { display: none !important; }
 .ob-welcome-text {
   margin-bottom: auto;
   padding-bottom: 40px;
+}
+
+.ob-welcome-desc {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ob-welcome-desc p {
+  font-size: 14px;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.ob-welcome-desc__closing {
+  font-size: 14px !important;
+  color: var(--color-text) !important;
+
 }
 
 /* ── Privacy screen ───────────────────────────────── */
@@ -1754,7 +1837,7 @@ body.room-open .bottom-nav { display: none !important; }
 .ob-swatch-sample {
   font-size: 10px;
   color: #111827;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .ob-swatch-sample--tight {
@@ -1935,6 +2018,17 @@ body.room-open .bottom-nav { display: none !important; }
   overflow-y: auto;
 }
 
+.ob-feature-nudge {
+  font-size:     12px;
+  color:         var(--color-accent);
+  background:    var(--color-accent-soft);
+  border-radius: 8px;
+  padding:       8px 12px;
+  margin-top:    2px;
+  line-height:   1.5;
+  animation:     feature-nudge-in 0.2s ease both;
+}
+
 .ob-feature-row {
   display: flex;
   align-items: center;
@@ -2022,6 +2116,7 @@ body.room-open .bottom-nav { display: none !important; }
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-top: 52px;
   padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 40px);
 }
 
@@ -2034,11 +2129,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .home-greeting__text {
-  font-size: 28px;
-  font-weight: 700;
   color: var(--color-text);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
 }
 
 .home-greeting__date {
@@ -2065,12 +2156,37 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .home-card__label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
   color: var(--color-muted);
   margin-bottom: 16px;
+}
+
+.three-things-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.three-things-header .home-card__label {
+  margin-bottom: 0;
+}
+
+.three-things-edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.three-things-edit-btn:active {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 /* ── Three Things input mode ──────────────────────── */
@@ -2208,7 +2324,7 @@ body.room-open .bottom-nav { display: none !important; }
 .three-things-ack {
   font-size: 13px;
   color: var(--color-accent);
-  font-style: italic;
+
   margin-top: 14px;
   animation: ack-appear 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -2242,9 +2358,6 @@ body.room-open .bottom-nav { display: none !important; }
 .three-things-collapsed:active { opacity: 0.55; }
 
 .three-things-collapsed__label {
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  letter-spacing: var(--tracking);
   color: var(--color-muted);
 }
 
@@ -2266,7 +2379,7 @@ body.room-open .bottom-nav { display: none !important; }
 
 .quote-card__text {
   font-size: 16px;
-  font-style: italic;
+
   color: var(--color-text);
   line-height: 1.65;
   margin-bottom: 14px;
@@ -2338,7 +2451,7 @@ body.room-open .bottom-nav { display: none !important; }
 .spark-card__done-text {
   font-size: 13px;
   color: var(--color-muted);
-  font-style: italic;
+
   margin-top: 12px;
 }
 
@@ -2353,10 +2466,6 @@ body.room-open .bottom-nav { display: none !important; }
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
   color: var(--color-accent);
 }
 
@@ -2441,10 +2550,6 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .tomorrow-card__eyebrow {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--color-accent);
   margin-bottom: 6px;
 }
@@ -2452,7 +2557,7 @@ body.room-open .bottom-nav { display: none !important; }
 .tomorrow-card__text {
   font-size: 14px;
   color: var(--color-text);
-  font-style: italic;
+
   line-height: 1.5;
 }
 
@@ -2505,8 +2610,6 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .evening-card__label {
-  font-size: 15px;
-  font-weight: 600;
   color: var(--color-text);
   margin-bottom: 2px;
 }
@@ -2519,7 +2622,7 @@ body.room-open .bottom-nav { display: none !important; }
 .evening-card__done {
   font-size: 14px;
   color: var(--color-muted);
-  font-style: italic;
+
 }
 
 /* ── North Star line (F10) ────────────────────────── */
@@ -2575,20 +2678,12 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .ev-header__eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--color-accent);
   margin-bottom: 6px;
 }
 
 .ev-header__title {
-  font-size: 28px;
-  font-weight: 700;
   color: var(--color-text);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
 }
 
 .ev-close {
@@ -2648,11 +2743,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .ev-spark-checkin__label {
-  font-size: 0.75rem;
-  font-weight: 600;
   color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
   margin-bottom: 6px;
 }
 
@@ -2752,10 +2843,6 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .ev-divider__label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--color-muted);
   white-space: nowrap;
 }
@@ -2861,16 +2948,29 @@ body.room-open .bottom-nav { display: none !important; }
   text-align: center;
 }
 
-/* ── North Star line (F10) ────────────────────────── */
+/* ── My One Thing (F10) ───────────────────────────── */
+
+.home-north-star-card {
+  border-left: 3px solid var(--color-accent);
+  padding: 10px 14px;
+  background: var(--color-accent-soft);
+  border-radius: 0 10px 10px 0;
+}
+
+.home-north-star-label {
+  font-size: var(--fs-label);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-accent);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
 
 .home-north-star {
-  font-size: 13px;
-  color: var(--color-muted);
-  font-style: italic;
-  text-align: center;
-  line-height: 1.5;
-  padding: 0 16px 8px;
-  margin-top: auto;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.45;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -2998,9 +3098,14 @@ body.room-open .bottom-nav { display: none !important; }
 
 .parking-tags {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
   margin-bottom: 18px;
+}
+
+.parking-tags__row {
+  display: flex;
+  gap: 8px;
 }
 
 .parking-tag {
@@ -3261,7 +3366,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-accent);
   background: var(--color-accent-soft);
   padding: 3px 10px;
@@ -3469,7 +3574,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   background: var(--color-border);
   padding: 2px 8px;
@@ -3592,7 +3697,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-accent);
   background: var(--color-accent-soft);
   padding: 3px 10px;
@@ -3687,18 +3792,14 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-accent);
   margin-bottom: 6px;
 }
 
 .figureout-title {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
   color: var(--color-text);
   margin-bottom: 20px;
-  line-height: 1.25;
 }
 
 .figureout-clarity-list {
@@ -4034,9 +4135,6 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .figureout-privacy__title {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
   color: var(--color-text);
   margin-bottom: 14px;
 }
@@ -4090,7 +4188,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-weight: 600;
   color: var(--color-muted);
   letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-transform: none;
   margin-bottom: 8px;
   text-align: center;
 }
@@ -4143,7 +4241,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-accent);
   margin-bottom: 8px;
 }
@@ -4153,7 +4251,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   background: var(--color-border);
   padding: 3px 10px;
@@ -4244,7 +4342,7 @@ body.room-open .bottom-nav { display: none !important; }
 .parking-burned-msg__text {
   font-size: 15px;
   color: var(--color-muted);
-  font-style: italic;
+
   letter-spacing: var(--tracking);
   line-height: 1.6;
 }
@@ -4322,9 +4420,9 @@ body.room-open .bottom-nav { display: none !important; }
   flex-shrink: 0;
 }
 
-/* Thinking — top-right of the input card */
+/* Thinking — bottom-right of the intentions card (input & tick modes) */
 .ambient-character--think {
-  top:    14px;
+  bottom: 10px;
   right:  10px;
   height: 64px;
 }
@@ -4336,11 +4434,17 @@ body.room-open .bottom-nav { display: none !important; }
   height: 52px;
 }
 
-/* Curious — top-right of the pending spark card */
+/* Curious — bottom-right of the spark card */
 .ambient-character--curious {
-  top:    10px;
+  bottom: 0;
   right:  8px;
   height: 60px;
+  top:    auto;
+}
+
+/* Keep spark text from running under the character in playful */
+[data-theme="playful"] .spark-card__text {
+  padding-right: 68px;
 }
 
 /* The north-star wrapper needs relative positioning */
@@ -4348,12 +4452,13 @@ body.room-open .bottom-nav { display: none !important; }
   position: relative;
 }
 
-[data-theme="playful"] .home-north-star-wrap .home-north-star {
-  padding-right: 56px;   /* keep text clear of the stargazing character */
+[data-theme="playful"] .home-north-star-wrap .home-north-star-card {
+  padding-right: 60px;   /* keep text clear of the stargazing character */
 }
 
-/* Containers that need relative positioning for new characters */
-.home-card--input {
+/* Containers that need relative positioning for ambient characters */
+.home-card--input,
+.home-card--three-things {
   position: relative;
   overflow: hidden;
 }
@@ -4361,11 +4466,6 @@ body.room-open .bottom-nav { display: none !important; }
 .spark-card {
   position: relative;
   overflow: hidden;
-}
-
-/* Right-gutter so spark text never hides under the curious character */
-[data-theme="playful"] .spark-card .spark-card__text {
-  padding-right: 68px;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -4386,11 +4486,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .ys-title {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: -0.025em;
   color: var(--color-text);
-  line-height: 1.15;
 }
 
 .ys-sub {
@@ -4495,8 +4591,6 @@ body.room-open .bottom-nav { display: none !important; }
 
 /* Door title */
 .ys-door__title {
-  font-size: 14px;
-  font-weight: 700;
   color: #1a1a1a;
 }
 
@@ -4528,7 +4622,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .ys-label--park    { color: #ec9c54; }
@@ -4567,7 +4661,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .ys-release-preview__quote {
-  font-family: 'Caveat', cursive;
+  font-family: var(--font-heading);
   font-size: 21px;
   font-weight: 500;
   color: #1a1a1a;
@@ -4617,7 +4711,7 @@ body.room-open .bottom-nav { display: none !important; }
   text-align: center;
   font-size: 11px;
   color: #9a9a9a;
-  font-style: italic;
+
   padding: 10px 20px 8px;
 }
 
@@ -4681,9 +4775,6 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .kw-header__title {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: var(--tracking);
   color: var(--color-text);
 }
 
@@ -4721,7 +4812,7 @@ body.room-open .bottom-nav { display: none !important; }
 .kw-empty {
   font-size: 14px;
   color: var(--color-muted);
-  font-style: italic;
+
   letter-spacing: var(--tracking);
   padding: 8px 0 16px;
 }
@@ -4858,6 +4949,51 @@ body.room-open .bottom-nav { display: none !important; }
 /* Solo (single visible) word card */
 .kw-item--solo {
   margin-bottom: 4px;
+}
+
+/* ── Stacked card visual ───────────────────────────────────────── */
+/* Shows when there are 2+ words; background cards peek out below  */
+/* the front card to signal there's more inside the jar.           */
+
+.kw-stack {
+  position: relative;
+  /* Extra bottom space so the peeking cards aren't clipped */
+}
+
+.kw-stack--one  { padding-bottom: 10px; }
+.kw-stack--deep { padding-bottom: 17px; }
+
+/* Background placeholder cards — purely decorative */
+.kw-stack__bg {
+  position:       absolute;
+  top:            0;
+  left:           0;
+  right:          0;
+  bottom:         0;
+  background:     var(--color-surface);
+  border:         1.5px solid var(--color-border);
+  border-radius:  12px;
+  pointer-events: none;
+}
+
+/* Second card: slightly narrower, offset downward */
+.kw-stack__bg--mid {
+  transform: translateY(8px) scaleX(0.93);
+  transform-origin: bottom center;
+  opacity: 0.75;
+}
+
+/* Third card: narrower still, offset further */
+.kw-stack__bg--back {
+  transform: translateY(15px) scaleX(0.86);
+  transform-origin: bottom center;
+  opacity: 0.45;
+}
+
+/* Front card must sit above the bg cards (DOM order handles this,
+   but position: relative ensures the stacking context is correct) */
+.kw-stack .kw-item {
+  position: relative;
 }
 
 /* Footer row with read-all + hard day side by side */
@@ -5024,7 +5160,7 @@ body.room-open .bottom-nav { display: none !important; }
 .kw-hardday__label {
   font-size: 14px;
   color: var(--color-muted);
-  font-style: italic;
+
   letter-spacing: var(--tracking);
   text-align: center;
   margin-bottom: 20px;
@@ -5300,7 +5436,7 @@ body.room-open .bottom-nav { display: none !important; }
 .nr-result-msg p {
   font-size: 18px;
   color: #808080;
-  font-style: italic;
+
   letter-spacing: var(--tracking);
   line-height: 1.5;
   text-align: center;
@@ -5316,7 +5452,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-transform: none;
   color: #444;
   margin-bottom: 12px;
 }
@@ -5432,7 +5568,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
+  text-transform: none;
   color: #7a6e55;
 }
 
@@ -5467,7 +5603,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .room-ritual p {
-  font-family: 'Caveat', cursive;
+  font-family: var(--font-heading);
   font-size: 22px;
   font-weight: 500;
   color: #c8b896;
@@ -5483,11 +5619,24 @@ body.room-open .bottom-nav { display: none !important; }
 /* ── Writing area ─────────────────────────────────────── */
 
 .room-writing-area {
-  position: relative;
   flex: 1;
+  display: flex;
+  flex-direction: column;
   margin-top: 28px;
   margin-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.room-writing-area::-webkit-scrollbar { display: none; }
+
+/* Flexible spacer — takes ~40% of the writing area so the first
+   typed character appears near the vertical middle of the screen.
+   Shrinks as the editor grows; once the editor fills the area the
+   writing area scrolls to keep the cursor in view. */
+.room-writing-spacer {
+  flex: 0 0 40%;
+  min-height: 0;
 }
 
 .room-writing-area--fading {
@@ -5499,41 +5648,32 @@ body.room-open .bottom-nav { display: none !important; }
   to   { opacity: 0; }
 }
 
-/* Coloured display layer — behind the transparent textarea */
-.room-lines-display {
-  position: absolute;
-  inset: 0;
-  font-family: 'Kalam', cursive;
-  font-size: 21px;
-  line-height: 1.5;
+/* Single contenteditable editor — handles both input and coloured display.
+   Using one element eliminates any cursor-vs-text misalignment that the
+   old textarea + overlay-div approach suffered from. */
+.room-editor {
+  width:        100%;
+  min-height:   2em;
+  font-family:  var(--font-heading);
+  font-size:    21px;
+  line-height:  1.5;
   letter-spacing: 0.2px;
-  overflow: hidden;
-  pointer-events: none;
-  word-break: break-word;
+  color:        #efe4cd;
+  caret-color:  #efe4cd;
+  word-break:   break-word;
+  outline:      none;
+  cursor:       text;
+}
+.room-editor::-webkit-scrollbar { display: none; } /* Chrome / Safari */
+
+/* Each paragraph line is a child <div> inserted by the browser */
+.room-editor > div {
+  min-height:  1.5em;
+  white-space: pre-wrap;
 }
 
-/* Transparent textarea — captures all input */
-.room-textarea {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  resize: none;
-  color: transparent;
-  caret-color: #efe4cd;
-  font-family: 'Kalam', cursive;
-  font-size: 21px;
-  line-height: 1.5;
-  letter-spacing: 0.2px;
-  padding: 0;
-  -webkit-appearance: none;
-  overflow-y: auto;
-}
-
-.room-textarea:disabled { cursor: default; }
+/* Disabled during releasing / fading */
+.room-editor[contenteditable="false"] { cursor: default; }
 
 /* ── Bottom bar ───────────────────────────────────────── */
 
@@ -5625,7 +5765,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .room-confirm__title {
-  font-family: 'Caveat', cursive;
+  font-family: var(--font-heading);
   font-size: 26px;
   font-weight: 700;
   color: #efe4cd;
@@ -5688,7 +5828,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .room-after__gone {
-  font-family: 'Caveat', cursive;
+  font-family: var(--font-heading);
   font-size: 44px;
   font-weight: 700;
   color: #efe4cd;
@@ -5697,7 +5837,7 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .room-after__sub {
-  font-family: 'Caveat', cursive;
+  font-family: var(--font-heading);
   font-size: 20px;
   font-weight: 500;
   color: #c8b896;
@@ -5743,17 +5883,13 @@ body.room-open .bottom-nav { display: none !important; }
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   color: var(--color-muted);
   margin-bottom: 4px;
 }
 
 .settle-title {
-  font-size: 1.875rem;
-  font-weight: 700;
   color: var(--color-text);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
 }
 
 .settle-sub {
@@ -5851,6 +5987,11 @@ body.room-open .bottom-nav { display: none !important; }
 
 .breath-chime-btn:active {
   opacity: 0.7;
+}
+
+/* Hidden on mobile — Web Audio requires gesture unlocking on iOS */
+@media (max-width: 768px) {
+  .breath-chime-btn { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -6229,12 +6370,8 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .wc-overlay__label {
-  font-size:      11px;
-  font-weight:    600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color:          var(--color-muted);
-  margin-bottom:  14px;
+  color:         var(--color-muted);
+  margin-bottom: 14px;
 }
 
 .wc-overlay__hint {
@@ -6308,7 +6445,7 @@ body.room-open .bottom-nav { display: none !important; }
   font-size:      9px;
   font-weight:    700;
   letter-spacing: 0.07em;
-  text-transform: uppercase;
+  text-transform: none;
   color:          var(--color-muted);
   opacity:        0.5;
   line-height:    1;
@@ -6683,3 +6820,309 @@ body.room-open .bottom-nav { display: none !important; }
 }
 
 .sw-update-toast__close:hover { opacity: 1; }
+
+/* ── First-run guide (bottom sheet walkthrough) ──────────────── */
+
+.frg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: rgba(18, 14, 8, 0.55);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  animation: frg-bg-in 0.35s ease both;
+}
+
+@keyframes frg-bg-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.frg-overlay--out {
+  animation: frg-bg-out 0.35s ease forwards;
+}
+
+.frg-overlay--out .frg-sheet {
+  animation: frg-sheet-out 0.35s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes frg-bg-out {
+  to { opacity: 0; }
+}
+
+@keyframes frg-sheet-out {
+  to { transform: translateY(100%); }
+}
+
+.frg-sheet {
+  position: relative;
+  width: 100%;
+  background: var(--color-card);
+  border-top: 1.5px solid var(--color-border);
+  border-radius: 24px 24px 0 0;
+  padding: 32px 24px 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: frg-sheet-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes frg-sheet-in {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.frg-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.frg-close:active { opacity: 0.6; }
+
+.frg-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-height: 200px;
+  justify-content: flex-start;
+  padding-top: 8px;
+}
+
+.frg-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--color-accent-soft);
+  border: 1.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.frg-title {
+  color: var(--color-text);
+  line-height: 1.25;
+  margin-bottom: 12px;
+}
+
+.frg-body {
+  font-size: 14px;
+  color: var(--color-muted);
+  line-height: 1.65;
+  max-width: 300px;
+}
+
+.frg-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 28px;
+  margin-bottom: 24px;
+}
+
+.frg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 0.25s, width 0.25s;
+}
+
+.frg-dot--active {
+  background: var(--color-accent);
+  width: 18px;
+  border-radius: 3px;
+}
+
+.frg-cta {
+  width: 100%;
+  max-width: 320px;
+  height: 50px;
+  border-radius: 14px;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.frg-cta:hover  { opacity: 0.9; }
+.frg-cta:active { transform: scale(0.98); }
+
+/* ── Contextual feature tour ─────────────────────────────────── */
+
+.tour-overlay {
+  position:       fixed;
+  inset:          0;
+  z-index:        700;
+  background:     rgba(12, 9, 4, 0.76);
+  pointer-events: all;
+  animation:      tour-fade-in 0.3s ease both;
+}
+
+/* Passthrough step (easel): let taps reach the real UI */
+.tour-overlay--passthrough {
+  pointer-events: none;
+}
+
+.tour-overlay--out {
+  animation: tour-fade-out 0.32s ease forwards;
+}
+
+@keyframes tour-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tour-fade-out { to   { opacity: 0; } }
+
+/* Highlight frame around the current target element */
+.tour-frame {
+  position:       fixed;
+  z-index:        710;
+  border:         2px solid var(--color-accent);
+  box-shadow:     0 0 0 5px rgba(150, 110, 60, 0.22), 0 0 20px rgba(150,110,60,0.15);
+  pointer-events: none;
+  animation:      tour-frame-pop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes tour-frame-pop {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Callout card ──────────────────────────────────────────────── */
+
+.tour-callout {
+  position:        fixed;
+  left:            50%;
+  transform:       translateX(-50%);
+  width:           min(310px, calc(100vw - 32px));
+  z-index:         720;
+  pointer-events:  all;
+  animation:       tour-callout-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes tour-callout-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Arrow pointing toward the highlighted element */
+.tour-arrow {
+  position:  absolute;
+  left:      50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+}
+
+/* Callout is BELOW element → arrow at top, pointing up */
+.tour-arrow--up {
+  top:          -9px;
+  border-left:  9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 9px solid #fefcf7;
+}
+
+/* Callout is ABOVE element → arrow at bottom, pointing down */
+.tour-arrow--down {
+  bottom:       -9px;
+  border-left:  9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top:   9px solid #fefcf7;
+}
+
+/* Inner card */
+.tour-callout__body-wrap {
+  background:    #fefcf7;
+  border:        1.5px solid rgba(180, 150, 100, 0.25);
+  border-radius: 18px;
+  padding:       18px 18px 16px;
+  box-shadow:    0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.tour-callout__top-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  margin-bottom:   12px;
+}
+
+.tour-callout__count {
+  font-size:      11px;
+  font-weight:    700;
+  color:          #8a7a62;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+.tour-callout__close {
+  width:           26px;
+  height:          26px;
+  border-radius:   50%;
+  border:          none;
+  background:      rgba(0,0,0,0.06);
+  color:           #7a6e5e;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tour-callout__close:active { opacity: 0.55; }
+
+.tour-callout__title {
+  font-size:     16px;
+  font-weight:   700;
+  color:         #1c1710;
+  line-height:   1.25;
+  margin-bottom: 7px;
+}
+
+.tour-callout__desc {
+  font-size:     13px;
+  color:         #5e5444;
+  line-height:   1.62;
+  margin-bottom: 16px;
+}
+
+.tour-callout__next {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             5px;
+  width:           100%;
+  height:          42px;
+  border-radius:   12px;
+  border:          none;
+  background:      var(--color-accent);
+  color:           #fff;
+  font-size:       14px;
+  font-weight:     600;
+  cursor:          pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:      opacity 0.15s, transform 0.15s;
+}
+
+.tour-callout__next:hover  { opacity: 0.9; }
+.tour-callout__next:active { transform: scale(0.97); }

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import db from '../db/db'
 import { applyTheme } from '../hooks/useTheme'
-import { ALL_FEATURES } from '../context/FeaturesContext'
+import { ALL_FEATURES, applyFeatureLinkage } from '../context/FeaturesContext'
 import Step1Welcome from './Step1Welcome'
 import Step2Privacy from './Step2Privacy'
 import Step3Theme from './Step3Theme'
@@ -37,9 +37,10 @@ export default function OnboardingFlow({ onComplete }) {
   }
 
   function handleToggleFeature(id) {
-    setFeatures(prev =>
-      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-    )
+    setFeatures(prev => {
+      const raw = prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+      return applyFeatureLinkage(raw)   // enforce space → kind_words, figure_it_out
+    })
   }
 
   async function handleComplete() {

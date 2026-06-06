@@ -237,6 +237,13 @@ export default function HomeScreen() {
     setTomorrowDateSet(null)
   }
 
+  async function handleEditIntentions(texts) {
+    if (!todayRecord?.id) return
+    const updates = { text_1: texts[0] || '', text_2: texts[1] || '', text_3: texts[2] || '' }
+    await db.daily_intentions.update(todayRecord.id, updates)
+    setTodayRecord(prev => ({ ...prev, ...updates }))
+  }
+
   async function handleTick(n, ticked) {
     if (!todayRecord?.id) return
     const updates = {
@@ -313,7 +320,6 @@ export default function HomeScreen() {
       <WeekCartoonCard
         show={showCartoon}
         onClose={() => setShowCartoon(false)}
-        onAutoShow={() => setShowCartoon(true)}
       />
       <GreetingHeader date={today} onEaselClick={() => setShowCartoon(true)} />
 
@@ -321,31 +327,37 @@ export default function HomeScreen() {
         <NotifNudge onDismiss={() => setShowNotifNudge(false)} />
       )}
 
+      <NorthStarLine text={northStar} />
+
       <QuoteCard
         quoteState={quoteState}
         dayNumber={dayNumber}
         onThumb={handleQuoteThumb}
       />
 
-      {isEvening && <EveningPromptCard done={eveningDone} />}
-      <NorthStarLine text={northStar} />
+      {isEvening && <div data-tour="evening"><EveningPromptCard done={eveningDone} /></div>}
 
       {tomorrowText && <TomorrowCard text={tomorrowText} dateSet={tomorrowDateSet} />}
 
-      <ThreeThingsCard
-        record={todayRecord}
-        onSave={handleSaveIntentions}
-        onTick={handleTick}
-      />
+      <div data-tour="intentions">
+        <ThreeThingsCard
+          record={todayRecord}
+          onSave={handleSaveIntentions}
+          onEdit={handleEditIntentions}
+          onTick={handleTick}
+        />
+      </div>
 
       {features.includes('spark') && (
-        <SparkCard
-          spark={todaysSpark}
-          animationKey={sparkAnimKey}
-          onDone={handleSparkDone}
-          onSkip={handleSparkSkip}
-          onShuffle={handleSparkShuffle}
-        />
+        <div data-tour="spark">
+          <SparkCard
+            spark={todaysSpark}
+            animationKey={sparkAnimKey}
+            onDone={handleSparkDone}
+            onSkip={handleSparkSkip}
+            onShuffle={handleSparkShuffle}
+          />
+        </div>
       )}
     </div>
   )

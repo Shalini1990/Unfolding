@@ -8,14 +8,37 @@ import { Volume2, VolumeX } from 'lucide-react'
 
 const PHASES = ['Inhale', 'Hold', 'Exhale', 'Hold']
 
-function playChime(phaseIdx) {
+// iOS only allows AudioContext audio after a synchronous user gesture.
+// async/await breaks the gesture trust — everything must be sync.
+let sharedCtx = null
+
+function unlockAudio() {
+  // 1. Create context synchronously inside the gesture
+  if (!sharedCtx) {
+    sharedCtx = new (window.AudioContext || window.webkitAudioContext)()
+  }
+  // 2. Play a 1-frame silent buffer — iOS requires actual playback, not just resume()
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const buf = sharedCtx.createBuffer(1, 1, 22050)
+    const src = sharedCtx.createBufferSource()
+    src.buffer = buf
+    src.connect(sharedCtx.destination)
+    src.start(0)
+  } catch (_) {}
+  // 3. Resume — also synchronous, returns a promise we intentionally don't await
+  sharedCtx.resume()
+}
+
+function playChime(phaseIdx) {
+  if (!sharedCtx) return
+  // Resume again in case context was suspended (e.g. tab switched)
+  if (sharedCtx.state === 'suspended') sharedCtx.resume()
+  try {
+    const ctx  = sharedCtx
     const osc  = ctx.createOscillator()
     const gain = ctx.createGain()
     osc.connect(gain)
     gain.connect(ctx.destination)
-    // Inhale → higher, Exhale → lower, Hold → mid
     const freqs = [528, 440, 396, 440]
     osc.frequency.value = freqs[phaseIdx]
     osc.type = 'sine'
@@ -24,7 +47,7 @@ function playChime(phaseIdx) {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7)
     osc.start(ctx.currentTime)
     osc.stop(ctx.currentTime + 0.75)
-  } catch (_) { /* silently fail if AudioContext unavailable */ }
+  } catch (_) {}
 }
 
 export default function BoxBreathing() {
@@ -36,6 +59,13 @@ export default function BoxBreathing() {
   const phaseRef  = useRef(0)
   const chimeRef  = useRef(false)
   useEffect(() => { chimeRef.current = chimeOn }, [chimeOn])
+
+  // Fully synchronous — no async/await — so iOS keeps gesture trust
+  function handleChimeToggle() {
+    const next = !chimeOn
+    if (next) unlockAudio()
+    setChimeOn(next)
+  }
 
   // Phase ticker — 4s per phase, matching CSS 16s keyframe
   useEffect(() => {
@@ -69,7 +99,7 @@ export default function BoxBreathing() {
       {/* Chime toggle */}
       <button
         className={`breath-chime-btn${chimeOn ? ' breath-chime-btn--on' : ''}`}
-        onClick={() => setChimeOn(v => !v)}
+        onClick={handleChimeToggle}
         type="button"
         aria-label={chimeOn ? 'Turn chime off' : 'Turn chime on'}
       >

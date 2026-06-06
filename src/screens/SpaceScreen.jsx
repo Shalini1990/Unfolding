@@ -66,12 +66,13 @@ export default function SpaceScreen() {
             <p className="ys-sub">Two ways to put a thought down.</p>
           </div>
 
-          <div className="ys-doors">
+          <div className="ys-doors" data-tour="space-doors">
             {/* Park it */}
             <button
               className={`ys-door${door === 'park' ? ' ys-door--park-on' : ' ys-door--off'}`}
               onClick={() => handleDoorChange('park')}
               type="button"
+              data-tour="park-door"
             >
               {door === 'park' && (
                 <span className="ys-door__chip ys-door__chip--park">SELECTED</span>
@@ -88,6 +89,7 @@ export default function SpaceScreen() {
               className={`ys-door ys-door--release${door === 'release' ? ' ys-door--release-on' : ' ys-door--off'}`}
               onClick={() => handleDoorChange('release')}
               type="button"
+              data-tour="release-door"
             >
               {door === 'release' && (
                 <span className="ys-door__chip ys-door__chip--release">SELECTED</span>
@@ -117,10 +119,10 @@ export default function SpaceScreen() {
                 <span className="ys-dot ys-dot--amber" />
                 Parking a thought
               </span>
-              <span className="ys-label__hint">tap the other door to switch</span>
+              <span className="ys-label__hint">tap to switch</span>
             </div>
           )}
-          <ParkingLot onModeChange={setParkMode} />
+          <div data-tour="parking-lot"><ParkingLot onModeChange={setParkMode} /></div>
           {!focused && <ResolvedSection />}
         </>
       )}
@@ -136,7 +138,7 @@ export default function SpaceScreen() {
             <span className="ys-label__hint">no save · no tags</span>
           </div>
 
-          <div className="ys-release-preview">
+          <div className="ys-release-preview" data-tour="let-it-out">
             <p className="ys-release-preview__quote">A room with no one in it.</p>
             <p className="ys-release-preview__sub">Write it there. Watch it go.</p>
             <button
@@ -157,7 +159,7 @@ export default function SpaceScreen() {
       {features.includes('kind_words') && !isRevisiting && door !== 'release' && (
         <>
           {!isHardDay && <div className="space-divider" />}
-          <KindWordsJar onModeChange={setKwMode} />
+          <div data-tour="kind-words"><KindWordsJar onModeChange={setKwMode} /></div>
         </>
       )}
 

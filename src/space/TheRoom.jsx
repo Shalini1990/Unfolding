@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { X } from 'lucide-react'
 
 // ── Inline ember dot ────────────────────────────────────────────
@@ -18,71 +18,95 @@ function EmberDot({ size = 6, glow = true }) {
   )
 }
 
-// ── Derive line colors ──────────────────────────────────────────
-function coloredLines(text) {
-  const lines = text.split('\n')
-  const n = lines.length
-  return lines.map((line, i) => {
-    const fromEnd = n - 1 - i
-    let color
-    if (fromEnd === 0)      color = '#efe4cd'
-    else if (fromEnd === 1) color = '#c8b896'
-    else                    color = '#7a6e55'
-    return { line, color }
-  })
+// ── Line colours (oldest → newest) ──────────────────────────────
+const LINE_COLORS = ['#7a6e55', '#c8b896', '#efe4cd']
+function colorForLine(fromEnd) {
+  return fromEnd === 0 ? LINE_COLORS[2] : fromEnd === 1 ? LINE_COLORS[1] : LINE_COLORS[0]
 }
 
 // ── Main component ──────────────────────────────────────────────
 export default function TheRoom({ onClose }) {
-  const [phase,       setPhase]       = useState('entered')
+  const [phase,        setPhase]        = useState('entered')
   // 'entered' | 'writing' | 'releasing' | 'fading' | 'after'
-  const [text,        setText]        = useState('')
-  const [isClosing,   setIsClosing]   = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [holdProgress,setHoldProgress]= useState(0)
-  const [scrollTop,   setScrollTop]   = useState(0)
+  const [text,         setText]         = useState('')
+  const [isClosing,    setIsClosing]    = useState(false)
+  const [showConfirm,  setShowConfirm]  = useState(false)
+  const [holdProgress, setHoldProgress] = useState(0)
 
   const holdActiveRef = useRef(false)
   const holdStartRef  = useRef(null)
   const rafRef        = useRef(null)
-  const textareaRef   = useRef(null)
-  const displayRef    = useRef(null)
+  const editorRef     = useRef(null)
+  // Keep a ref to phase so startHold closure sees fresh value
+  const phaseRef      = useRef(phase)
+  useEffect(() => { phaseRef.current = phase }, [phase])
 
-  const lineCount  = text.trim() ? text.split('\n').filter(l => l.length > 0).length : 0
+  const lineCount   = text.trim() ? text.split('\n').filter(l => l.length > 0).length : 0
   const isReleasing = phase === 'releasing'
   const breadcrumb  = isReleasing ? 'Releasing…' : 'YOUR SAFE SPACE'
 
-  // Sync display div scroll to textarea scroll
-  function handleScroll(e) {
-    setScrollTop(e.target.scrollTop)
-  }
-
+  // Initialise editor with an empty div line (Chrome default structure)
   useEffect(() => {
-    if (displayRef.current) {
-      displayRef.current.scrollTop = scrollTop
-    }
-  }, [scrollTop])
+    const el = editorRef.current
+    if (!el) return
+    el.innerHTML = '<div><br></div>'
+    el.focus()
+    try {
+      const range = document.createRange()
+      range.setStart(el.firstChild, 0)
+      range.collapse(true)
+      const sel = window.getSelection()
+      sel?.removeAllRanges()
+      sel?.addRange(range)
+    } catch { /* ignore */ }
+  }, [])
 
   // Cleanup RAF on unmount
   useEffect(() => {
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [])
 
-  // ── Text change ───────────────────────────────────────────────
-  function handleTextChange(e) {
-    const val = e.target.value
-    setText(val)
-    if (val.trim() && phase === 'entered') setPhase('writing')
-    if (!val.trim() && phase === 'writing') setPhase('entered')
+  // ── Colour update — ONLY changes style.color, never touches cursor ──
+  const updateColors = useCallback(() => {
+    const el = editorRef.current
+    if (!el) return
+    const kids = Array.from(el.children)   // element nodes only (divs)
+    const n    = kids.length
+    kids.forEach((div, i) => {
+      div.style.color = colorForLine(n - 1 - i)
+    })
+  }, [])
+
+  // Read the current raw text from the editor
+  function getRawText() {
+    const el = editorRef.current
+    if (!el) return ''
+    let t = el.innerText ?? ''
+    // Chrome appends a trailing \n from the last line div — strip it
+    if (t.endsWith('\n')) t = t.slice(0, -1)
+    return t
+  }
+
+  // ── Input handler ──────────────────────────────────────────────
+  function handleInput() {
+    const raw = getRawText()
+    setText(raw)
+    if (raw.trim() && phase === 'entered') setPhase('writing')
+    if (!raw.trim() && phase === 'writing') setPhase('entered')
+    requestAnimationFrame(updateColors)
+  }
+
+  // Strip rich formatting on paste
+  function handlePaste(e) {
+    e.preventDefault()
+    const plain = e.clipboardData?.getData('text/plain') ?? ''
+    document.execCommand('insertText', false, plain)
   }
 
   // ── Close ─────────────────────────────────────────────────────
   function requestClose() {
-    if (text.trim()) {
-      setShowConfirm(true)
-    } else {
-      doClose()
-    }
+    if (getRawText().trim()) setShowConfirm(true)
+    else doClose()
   }
 
   function doClose() {
@@ -92,7 +116,8 @@ export default function TheRoom({ onClose }) {
 
   // ── Hold gesture ──────────────────────────────────────────────
   function startHold(e) {
-    if (phase !== 'writing' || !text.trim() || holdActiveRef.current) return
+    const ph = phaseRef.current
+    if (ph !== 'writing' || !getRawText().trim() || holdActiveRef.current) return
     e.preventDefault()
     holdActiveRef.current = true
     holdStartRef.current  = Date.now()
@@ -124,6 +149,8 @@ export default function TheRoom({ onClose }) {
     setPhase('fading')
     setHoldProgress(0)
     setTimeout(() => {
+      const el = editorRef.current
+      if (el) el.innerHTML = '<div><br></div>'
       setText('')
       setPhase('after')
     }, 450)
@@ -158,20 +185,8 @@ export default function TheRoom({ onClose }) {
           <p className="room-confirm__title">Leave the room?</p>
           <p className="room-confirm__sub">Anything you wrote will be lost.</p>
           <div className="room-confirm__actions">
-            <button
-              className="room-confirm__stay"
-              onClick={() => setShowConfirm(false)}
-              type="button"
-            >
-              Stay
-            </button>
-            <button
-              className="room-confirm__leave"
-              onClick={doClose}
-              type="button"
-            >
-              Leave
-            </button>
+            <button className="room-confirm__stay"  onClick={() => setShowConfirm(false)} type="button">Stay</button>
+            <button className="room-confirm__leave" onClick={doClose}                     type="button">Leave</button>
           </div>
         </div>
       )}
@@ -179,8 +194,7 @@ export default function TheRoom({ onClose }) {
       {/* ── Main content ───────────────────────────────────────── */}
       {!showConfirm && (
         <>
-
-          {/* State: entered — ritual lines */}
+          {/* Ritual prompt — shown before typing starts */}
           {phase === 'entered' && (
             <div className="room-ritual">
               <p>Nothing here is saved.</p>
@@ -188,59 +202,39 @@ export default function TheRoom({ onClose }) {
             </div>
           )}
 
-          {/* Writing area — shown during entered/writing/releasing/fading */}
+          {/* Writing area — single contenteditable div handles both input and display */}
           {(phase === 'entered' || phase === 'writing' || phase === 'releasing' || phase === 'fading') && (
             <div className={`room-writing-area${phase === 'fading' ? ' room-writing-area--fading' : ''}`}>
-
-              {/* Styled line display (behind textarea) */}
-              <div className="room-lines-display" ref={displayRef} aria-hidden="true">
-                {coloredLines(text).map(({ line, color }, i) => (
-                  <div
-                    key={i}
-                    style={{ color, transition: 'color 200ms ease', whiteSpace: 'pre-wrap', minHeight: '1.5em' }}
-                  >
-                    {line || ' '}
-                  </div>
-                ))}
-              </div>
-
-              {/* Transparent textarea — captures input */}
-              <textarea
-                ref={textareaRef}
-                className="room-textarea"
-                value={text}
-                onChange={handleTextChange}
-                onScroll={handleScroll}
-                autoFocus
-                disabled={phase === 'releasing' || phase === 'fading'}
+              <div className="room-writing-spacer" aria-hidden="true" />
+              <div
+                ref={editorRef}
+                className="room-editor"
+                contentEditable={phase === 'releasing' || phase === 'fading' ? 'false' : 'true'}
+                suppressContentEditableWarning={true}
+                onInput={handleInput}
+                onPaste={handlePaste}
                 spellCheck={false}
-                autoComplete="off"
-                autoCorrect="off"
                 autoCapitalize="sentences"
+                data-gramm="false"          /* disable Grammarly overlay */
+                data-gramm_editor="false"
               />
             </div>
           )}
 
-          {/* State: after */}
+          {/* After-release screen */}
           {phase === 'after' && (
             <div className="room-after">
               <p className="room-after__gone">Gone.</p>
               <p className="room-after__sub">that's yours to leave</p>
-              <button
-                className="room-after__close"
-                onClick={doClose}
-                type="button"
-              >
+              <button className="room-after__close" onClick={doClose} type="button">
                 I'm okay · close
               </button>
             </div>
           )}
 
-          {/* Bottom bar — writing states */}
+          {/* Bottom bar */}
           {(phase === 'entered' || phase === 'writing' || phase === 'releasing') && (
             <div className="room-bottom">
-
-              {/* Counter */}
               <div className="room-meta-row">
                 <span
                   className="room-counter"
@@ -255,7 +249,6 @@ export default function TheRoom({ onClose }) {
                 </span>
               </div>
 
-              {/* Hold-to-release */}
               <div
                 className={`room-release-btn${!text.trim() ? ' room-release-btn--empty' : ''}${isReleasing ? ' room-release-btn--active' : ''}`}
                 role="button"
@@ -265,21 +258,14 @@ export default function TheRoom({ onClose }) {
                 onPointerLeave={cancelHold}
                 onPointerCancel={cancelHold}
               >
-                {/* Fill bar */}
-                <div
-                  className="room-release-btn__fill"
-                  style={{ width: `${holdProgress * 100}%` }}
-                />
-                {/* Label */}
+                <div className="room-release-btn__fill" style={{ width: `${holdProgress * 100}%` }} />
                 <EmberDot size={8} glow={isReleasing} />
                 <span className="room-release-btn__label">
                   {isReleasing ? 'Releasing…' : 'Hold to release'}
                 </span>
               </div>
-
             </div>
           )}
-
         </>
       )}
     </div>

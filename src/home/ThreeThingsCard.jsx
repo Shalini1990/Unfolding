@@ -1,16 +1,16 @@
 import { useRef, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Pencil } from 'lucide-react'
 import { FistPumpCharacter, ThinkingCharacter } from '../components/DoneCharacter'
 import PrivacyNudge from '../components/PrivacyNudge'
 
 const ACK = {
   1: "One down — you're moving",
-  2: 'Halfway there',
+  2: 'Almost there',
   3: "All three. That's a real day.",
 }
 
-function InputMode({ onSave }) {
-  const [texts, setTexts] = useState(['', '', ''])
+function InputMode({ onSave, initialTexts = ['', '', ''], submitLabel = 'Set my intentions' }) {
+  const [texts, setTexts] = useState(initialTexts)
   const ref1 = useRef(null)
   const ref2 = useRef(null)
   const ref3 = useRef(null)
@@ -65,13 +65,13 @@ function InputMode({ onSave }) {
         disabled={!hasAny}
         type="button"
       >
-        Set my intentions
+        {submitLabel}
       </button>
     </div>
   )
 }
 
-function TickMode({ record, onTick }) {
+function TickMode({ record, onTick, onEditClick }) {
   const items = [1, 2, 3]
     .map(n => ({ n, text: record[`text_${n}`], ticked: !!record[`ticked_${n}`] }))
     .filter(item => item.text)
@@ -81,8 +81,13 @@ function TickMode({ record, onTick }) {
   const ackMsg = ACK[tickCount] || null
 
   return (
-    <div className={`home-card${allDone ? ' home-card--done' : ''}`}>
-      <p className="home-card__label">Three things to accomplish</p>
+    <div className={`home-card home-card--three-things${allDone ? ' home-card--done' : ''}`}>
+      <div className="three-things-header">
+        <p className="home-card__label">Three things to accomplish</p>
+        <button className="three-things-edit-btn" onClick={onEditClick} type="button" aria-label="Edit intentions">
+          <Pencil size={13} strokeWidth={2} />
+        </button>
+      </div>
       <div className="three-things-list">
         {items.map(({ n, text, ticked }) => (
           <button
@@ -112,17 +117,17 @@ function TickMode({ record, onTick }) {
           {ackMsg}
         </p>
       )}
-      {allDone && <FistPumpCharacter />}
+      {allDone ? <FistPumpCharacter /> : <ThinkingCharacter />}
     </div>
   )
 }
 
-export default function ThreeThingsCard({ record, onSave, onTick }) {
+export default function ThreeThingsCard({ record, onSave, onEdit, onTick }) {
   const [expanded, setExpanded] = useState(false)
+  const [editing, setEditing] = useState(false)
   const isEvening = new Date().getHours() >= 17
 
   if (!record?.intentions_set) {
-    // After 5 PM with nothing set — collapse to a quiet single line
     if (isEvening && !expanded) {
       return (
         <button
@@ -138,5 +143,17 @@ export default function ThreeThingsCard({ record, onSave, onTick }) {
     }
     return <InputMode onSave={onSave} />
   }
-  return <TickMode record={record} onTick={onTick} />
+
+  if (editing) {
+    const initialTexts = [record.text_1 || '', record.text_2 || '', record.text_3 || '']
+    return (
+      <InputMode
+        initialTexts={initialTexts}
+        submitLabel="Save changes"
+        onSave={texts => { onEdit(texts); setEditing(false) }}
+      />
+    )
+  }
+
+  return <TickMode record={record} onTick={onTick} onEditClick={() => setEditing(true)} />
 }

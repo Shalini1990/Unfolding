@@ -29,6 +29,7 @@ export default function PauseButton({ onPress }) {
       onClick={onPress}
       aria-label="Pause — tap to begin 3-2-1 grounding"
       type="button"
+      data-tour="grounding"
     >
       <CairnIcon size={24} />
     </button>

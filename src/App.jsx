@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import FeaturesContext, { ALL_FEATURES } from './context/FeaturesContext'
 import BottomNav from './components/BottomNav'
 import PauseButton from './components/PauseButton'
@@ -19,18 +19,36 @@ import { scheduleDay } from './utils/notifications'
 import { useInstallPrompt } from './hooks/useInstallPrompt'
 import { isIOSSafari, isStandalone } from './utils/pwa'
 import ScrollToTop from './components/ScrollToTop'
+import Tour, { shouldShowTour, TOUR_KEY } from './components/Tour'
 
 export default function App() {
   // null = still checking, false = not complete, true = complete
   const [onboardingComplete, setOnboardingComplete] = useState(null)
   const [groundingOpen,      setGroundingOpen]      = useState(false)
   const [features,           setFeatures]           = useState(ALL_FEATURES)
+  const [tourActive,         setTourActive]         = useState(false)
+  const navigate = useNavigate()
 
   const loadFeatures = useCallback(async () => {
     try {
       const rec = await db.settings.where('key').equals('features_enabled').first()
-      if (rec?.value) setFeatures(JSON.parse(rec.value))
-      else            setFeatures(ALL_FEATURES)
+      if (rec?.value) {
+        const stored = JSON.parse(rec.value)
+        // Migration: old feature lists include 'evening' (now removed).
+        // When detected, strip 'evening' and add any new default features so
+        // existing users automatically get grounding, kind_words, etc.
+        if (stored.includes('evening')) {
+          const cleaned  = stored.filter(f => f !== 'evening')
+          const newOnes  = ALL_FEATURES.filter(f => !cleaned.includes(f))
+          const migrated = [...cleaned, ...newOnes]
+          await db.settings.update(rec.id, { value: JSON.stringify(migrated) })
+          setFeatures(migrated)
+        } else {
+          setFeatures(stored)
+        }
+      } else {
+        setFeatures(ALL_FEATURES)
+      }
     } catch { setFeatures(ALL_FEATURES) }
   }, [])
 
@@ -75,13 +93,24 @@ export default function App() {
 
   useEffect(() => { loadFeatures() }, [loadFeatures])
 
-  // Show iOS guide once, 1.5 s after onboarding completes
+  // After onboarding, reload features and start the tour
   function handleOnboardingComplete() {
     setOnboardingComplete(true)
+    loadFeatures()
+    navigate('/home', { replace: true })
+    // Start the feature tour (slight delay so the home screen mounts first)
+    setTimeout(() => setTourActive(true), 300)
     if (isIOSSafari() && !isStandalone() && !isIOSSheetShown()) {
       setTimeout(() => setShowIOSSheet(true), 1500)
     }
   }
+
+  // On subsequent launches: check if tour was dismissed already
+  useEffect(() => {
+    if (onboardingComplete === true && shouldShowTour()) {
+      setTimeout(() => setTourActive(true), 500)
+    }
+  }, [onboardingComplete])
 
   // Hold render until DB check resolves — use a styled div to avoid white flash
   if (onboardingComplete === null) return <div className="app-loading" />
@@ -116,8 +145,16 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Navigate to="/home" replace />} />
                 <Route path="/home"   element={<HomeScreen />}   />
-                <Route path="/space"  element={<SpaceScreen />}  />
-                <Route path="/settle" element={<SettleScreen />} />
+                <Route path="/space"  element={
+                  features.includes('space')
+                    ? <SpaceScreen />
+                    : <Navigate to="/home" replace />
+                } />
+                <Route path="/settle" element={
+                  features.includes('settle')
+                    ? <SettleScreen />
+                    : <Navigate to="/home" replace />
+                } />
                 <Route path="/me"     element={<MeScreen />}     />
                 <Route path="*"       element={<Navigate to="/home" replace />} />
               </Routes>
@@ -132,6 +169,11 @@ export default function App() {
           </div>
         } />
       </Routes>
+
+      {/* Feature tour — rendered outside Routes so it layers over the whole shell */}
+      {tourActive && (
+        <Tour features={features} onDone={() => setTourActive(false)} />
+      )}
 
       {/* iOS install guide — rendered outside Routes so it layers over everything */}
       {showIOSSheet && (

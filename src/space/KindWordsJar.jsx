@@ -222,28 +222,41 @@ export default function KindWordsJar({ onModeChange }) {
         <p className="kw-empty">Kind words live here. Add the first one.</p>
       ) : (
         <>
+          {/* Stack visual — background cards hint at more words */}
           <div
-            className={`kw-item kw-item--solo${revealedId === words[0].id ? ' kw-item--revealed' : ''}`}
-            onClick={() => setRevealedId(prev => prev === words[0].id ? null : words[0].id)}
-            role="button"
-            tabIndex={0}
+            className={[
+              'kw-stack',
+              words.length === 2 ? 'kw-stack--one'  : '',
+              words.length >= 3  ? 'kw-stack--deep' : '',
+            ].filter(Boolean).join(' ')}
           >
-            <p className="kw-item__text">{words[0].text}</p>
-            {revealedId === words[0].id && (
-              <button
-                className="kw-item__delete"
-                onClick={e => { e.stopPropagation(); handleDelete(words[0].id) }}
-                type="button"
-                aria-label="Delete"
-              >
-                <X size={14} strokeWidth={2.5} />
-              </button>
-            )}
+            {words.length >= 3 && <div className="kw-stack__bg kw-stack__bg--back" aria-hidden="true" />}
+            {words.length >= 2 && <div className="kw-stack__bg kw-stack__bg--mid"  aria-hidden="true" />}
+            {/* Front card — most recent word; tap to reveal delete */}
+            <div
+              className={`kw-item${revealedId === words[0].id ? ' kw-item--revealed' : ''}`}
+              onClick={() => setRevealedId(prev => prev === words[0].id ? null : words[0].id)}
+              role="button"
+              tabIndex={0}
+            >
+              <p className="kw-item__text">{words[0].text}</p>
+              {revealedId === words[0].id && (
+                <button
+                  className="kw-item__delete"
+                  onClick={e => { e.stopPropagation(); handleDelete(words[0].id) }}
+                  type="button"
+                  aria-label="Delete"
+                >
+                  <X size={14} strokeWidth={2.5} />
+                </button>
+              )}
+            </div>
           </div>
 
-          {words.length >= 3 && (
+          {/* Single CTA — only shown when there are 2+ words */}
+          {words.length >= 2 && (
             <button className="kw-hardday-btn" onClick={enterHardDay} type="button">
-              Having a hard day? Read these.
+              Having a hard day? See all {words.length} words
             </button>
           )}
         </>

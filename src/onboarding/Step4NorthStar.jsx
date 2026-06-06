@@ -4,9 +4,9 @@ export default function Step4NorthStar({ northStar, setNorthStar, next }) {
   return (
     <div className="ob-screen">
       <div className="ob-content">
-        <h2 className="ob-title">What matters most to you right now?</h2>
+        <h2 className="ob-title">What do you want to come back to, every day?</h2>
         <p className="ob-subtitle">
-          This will quietly guide the app. One sentence is enough.
+          A goal, a reminder, or an anchor. Just one line you want to carry with you every day.
         </p>
         <textarea
           className="ob-textarea"

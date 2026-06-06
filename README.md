@@ -6,6 +6,10 @@ A calm daily journalling PWA — morning intentions, evening reflections, a park
 
 **Live:** https://unfolding-yourstory.vercel.app
 
+> Best experienced as a home screen app.
+> **iOS:** Safari → Share → Add to Home Screen
+> **Android:** Chrome → ⋮ menu → Add to Home Screen
+
 ---
 
 ## What it does
@@ -13,16 +17,15 @@ A calm daily journalling PWA — morning intentions, evening reflections, a park
 Unfolding gives you a lightweight daily ritual loop. Not a meditation app, not a productivity tool — a private space to start and end each day with intention.
 
 ### Home — Morning ritual
-- A daily quote and a small **Spark** task (a tiny act of care, curiosity, or creativity)
-- **North Star** — one guiding phrase that stays visible all day
-- **Three Intentions** — the things that matter most today, with tick-off
+- **My One Thing** — a goal, a reminder, or an anchor. One line you want to carry with you every day. Shown prominently above the quote each morning
+- A daily **Quote** and a small **Spark** task (a tiny act of care, curiosity, or creativity)
+- **Three Intentions** — the things that matter most today, with tick-off and inline edit
 - **Tomorrow's one thing** — carried over from the evening before
 
 ### Space — Clear your head
-- **Parking Lot** — dump any thought, worry, or idea so it stops circling your head; tag it, revisit it, or release it
-- **Negativity Release** — burn or float away something you're ready to let go of
+- **Parking Lot** — dump any thought, worry, or idea so it stops circling your head; tag it (Low mood · Worry · Anger / Decision · Idea · Dream), revisit it, or release it
+- **Let it out** — write freely with no saving; burn it when done
 - **Kind Words Jar** — collect small wins and kind words to read on hard days
-- **The Room** — a quiet visual space to sit in for a moment
 
 ### Settle — Calm down
 - **Box Breathing** — a guided 4-4-4-4 breathing exercise
@@ -30,7 +33,7 @@ Unfolding gives you a lightweight daily ritual loop. Not a meditation app, not a
 
 ### Evening Ritual — Reflect on today
 - Three reflection prompts: something learnt, something to be grateful for, something that made you smile
-- On Sundays: a warm-thought prompt (someone who came to mind this week) and a weekly summary
+- On Sundays: a warm-thought prompt (someone who came to mind this week)
 - Spark check-in — mark your spark done or skipped if you haven't already
 - **Tomorrow's one thing** — leave yourself something to wake up to
 
@@ -42,9 +45,36 @@ Unfolding gives you a lightweight daily ritual loop. Not a meditation app, not a
 
 ### Me — Your profile and history
 - Set your name, age, and accent colour
+- Collapsible sections: **My One Thing**, **App Feel**, **Notifications**, **Features**, **Your Privacy**
 - Browse past reflection entries, intentions, spark log, and clarity cards
 - Manage notification reminders (morning and evening)
 - Export or clear all data
+
+---
+
+## Themes
+
+Unfolding ships with two visual themes — **Minimal** and **Playful** — plus six **accent colour** presets (Slate, Sage, Dusk, Clay, Stone, Rose).
+
+| | Minimal | Playful |
+|---|---|---|
+| Body font | Nunito | Nunito |
+| Heading font | Nunito | Caveat |
+| Base colour | White | Warm off-white |
+| Accent | 6 presets | Amber |
+
+Themes are driven by CSS custom properties (`--font-sans`, `--font-heading`, `--fs-*` type scale) on `:root` (Minimal) and `[data-theme="playful"]`. An inline script in `index.html` reads `localStorage` before React mounts to avoid a flash of the wrong theme.
+
+### Type scale
+
+| Variable | Minimal | Playful (Caveat) | Usage |
+|---|---|---|---|
+| `--fs-title` | 26px | 34px | Screen headings |
+| `--fs-heading` | 17px | 23px | Card labels, section titles |
+| `--fs-body` | 15px | 15px | Body text, inputs |
+| `--fs-small` | 13px | 13px | Secondary text |
+| `--fs-label` | 11px | 11px | Eyebrows, tags |
+| `--fs-micro` | 10px | 10px | Timestamps, counts |
 
 ---
 
@@ -60,7 +90,7 @@ All journal data lives in IndexedDB on your device. Nothing is synced to a serve
 |---|---|
 | Framework | React 19 + Vite |
 | Styling | Tailwind CSS v4 + CSS custom properties |
-| Font | Plus Jakarta Sans |
+| Fonts | Nunito (Minimal), Caveat (Playful headings) — via @fontsource |
 | Local DB | Dexie.js v4 (IndexedDB) |
 | Routing | React Router v7 |
 | Icons | lucide-react |
@@ -82,6 +112,7 @@ Open [http://localhost:5173](http://localhost:5173).
 ```bash
 npm run build    # production build
 npm run preview  # preview the build locally
+npm run deploy   # build + deploy to Vercel + update alias
 ```
 
 ### AI feature (optional)
@@ -112,30 +143,31 @@ public/
 src/
   components/           # Shared UI
     BottomNav.jsx
-    DoneCharacter.jsx
+    DoneCharacter.jsx   # Playful theme cartoon characters
     ErrorBoundary.jsx
+    FirstRunGuide.jsx
     GroundingOverlay.jsx
     IOSInstallSheet.jsx
     InstallBanner.jsx
     PauseButton.jsx
     PrivacyNudge.jsx
-    ScrollToTop.jsx
+    Tour.jsx
 
   data/                 # Static content
     cartoons.jsx        # Week summary cartoon data
     quotes.js           # Daily quote pool
-    sparks.js           # Spark task pool
+    sparks.js           # Spark task pool (40 tasks, 8×5 types)
 
   db/
-    db.js               # Dexie schema (all tables)
+    db.js               # Dexie schema (16 tables)
 
   home/                 # Home screen sub-components
     EveningPromptCard.jsx
     GreetingHeader.jsx
-    NorthStarLine.jsx
+    NorthStarLine.jsx   # "My One Thing" card
     QuoteCard.jsx
     SparkCard.jsx
-    ThreeThingsCard.jsx
+    ThreeThingsCard.jsx # Input + tick + inline edit modes
     TomorrowCard.jsx
     WeekCartoonCard.jsx
 
@@ -154,37 +186,28 @@ src/
     SpaceScreen.jsx
 
   settle/               # Settle screen sub-components
-    BoxBreathing.jsx
+    BoxBreathing.jsx    # 4-4-4-4 box breathing with iOS audio unlock
     ColourFill.jsx
 
   space/                # Space screen sub-components
     ClarityCard.jsx
     JarSVG.jsx
     KindWordsJar.jsx
-    NegativityRelease.jsx
-    ParkingLot.jsx
+    ParkingLot.jsx      # Tag rows: [Low mood, Worry, Anger] / [Decision, Idea, Dream]
     ResolvedSection.jsx
-    TheRoom.jsx
+    TheRoom.jsx         # "Let it out" — vertically centred editor, grows upward
 
   utils/
-    date.js             # Date helpers (getTodayDate, getWeekStart, etc.)
-    notifications.js    # Web Push permission + scheduling helpers
-    pwa.js              # Install prompt helpers
-    sparkAlgorithm.js   # Weighted daily spark selection
+    date.js
+    notifications.js
+    pwa.js
+    sparkAlgorithm.js
 
-  App.jsx               # Router + app shell
-  index.css             # All CSS variables, themes, and component styles
+  App.jsx
+  index.css             # All CSS variables, themes, type scale, component styles
   main.jsx
-  sw.js                 # Workbox service worker
+  sw.js
 ```
-
----
-
-## Themes
-
-Unfolding ships with two visual themes — **Minimal** (default) and **Playful** — plus six **accent colour** presets (Slate, Sage, Dusk, Clay, Stone, Rose).
-
-Themes are driven by CSS custom properties on `:root` (Minimal) and `[data-theme="playful"]`. An inline script in `index.html` reads `localStorage` before React mounts to avoid a flash of the wrong theme.
 
 ---
 

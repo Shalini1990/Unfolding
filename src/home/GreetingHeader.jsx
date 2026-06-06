@@ -50,6 +50,7 @@ export default function GreetingHeader({ date, onEaselClick }) {
             onClick={onEaselClick}
             type="button"
             aria-label="This week"
+            data-tour="easel"
           >
             <PaintingIcon />
           </button>

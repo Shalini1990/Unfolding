@@ -26,7 +26,6 @@ export default function SparkCard({ spark, animationKey, onDone, onSkip, onShuff
 
   return (
     <div className="spark-card">
-      <CuriousCharacter />
       <div className="spark-card__header">
         <p className="spark-card__eyebrow">
           <Zap size={11} strokeWidth={2.5} aria-hidden="true" />
@@ -44,6 +43,7 @@ export default function SparkCard({ spark, animationKey, onDone, onSkip, onShuff
       <p className="spark-card__text" key={animationKey}>
         {spark.task_text}
       </p>
+      <CuriousCharacter />
       <div className="spark-card__actions">
         <button className="spark-card__btn-done" onClick={onDone} type="button">
           Done

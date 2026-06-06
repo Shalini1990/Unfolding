@@ -14,7 +14,7 @@ export default function SettleScreen() {
   return (
     <div className={`settle-screen${tab === 'colour' ? ' settle-screen--fill' : ''}`}>
 
-      <div className="settle-header">
+      <div className="settle-header" data-tour="settle">
         <h1 className="settle-title">Settle</h1>
         <p className="settle-sub">{active.sub}</p>
       </div>

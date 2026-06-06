@@ -4,10 +4,9 @@ import { getWeekStart, getDayOfWeek, getTodayDate } from '../utils/date'
 import { useTheme } from '../hooks/useTheme'
 import { CARTOONS, pickWeekColors, pickCartoon } from '../data/cartoons'
 
-const FILL_DURATION  = 5      // seconds — how long today's colour seeps in
-const FILL_START     = 200    // ms — delay before fill begins
-const DISMISS_ANIM   = FILL_START + FILL_DURATION * 1000  // 5200ms
-const DISMISS_STATIC = 5000   // ms — manual open (unchanged)
+const FILL_DURATION = 5      // seconds — how long today's colour seeps in
+const FILL_START    = 200    // ms — delay before fill begins
+const DISMISS_MS    = FILL_START + FILL_DURATION * 1000  // 5200ms — auto-dismiss
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -107,15 +106,14 @@ function SVGCartoon({ cartoonId, partitions, colors, isMinimal, animateIdx }) {
 }
 
 // ── Overlay (controlled by parent) ───────────────────────────────
-function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal, onClose, animate }) {
-  const dismissDelay = animate ? DISMISS_ANIM : DISMISS_STATIC
+function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal, onClose }) {
+  const dismissDelay = DISMISS_MS
 
   const [exiting,      setExiting]      = useState(false)
+  // Always animate: start with today's partition empty, fill it in on open
   const [visibleParts, setVisibleParts] = useState(() => {
-    if (!animate) return partitions
-    // All previous days pre-filled — only today starts empty and animates in
     const initial = [...partitions]
-    initial[todayIdx] = false
+    initial[todayIdx] = false   // will animate to filled after FILL_START ms
     return initial
   })
   const timerRef = useRef(null)
@@ -133,10 +131,8 @@ function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal
     return () => clearTimeout(timerRef.current)
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Trigger today's fill after FILL_START ms — transition carries it to completion
-  // exactly when the progress bar drains to zero
+  // After FILL_START ms, transition today's partition to filled
   useEffect(() => {
-    if (!animate || !partitions[todayIdx]) return
     const t = setTimeout(() => {
       setVisibleParts(prev => {
         const next = [...prev]
@@ -160,15 +156,15 @@ function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal
           partitions={visibleParts}
           colors={colors}
           isMinimal={isMinimal}
-          animateIdx={animate ? todayIdx : null}
+          animateIdx={todayIdx}
         />
 
         <DayDots
           partitions={visibleParts}
           colors={colors}
           todayIdx={todayIdx}
-          animateIdx={animate ? todayIdx : null}
-          animateDuration={animate ? FILL_DURATION : null}
+          animateIdx={todayIdx}
+          animateDuration={FILL_DURATION}
         />
 
         <div className="wc-progress">
@@ -187,20 +183,17 @@ function WeekCartoonOverlay({ cartoonId, partitions, colors, todayIdx, isMinimal
 
 // ── Root — data loader + overlay renderer ─────────────────────────
 // Props:
-//   show       — whether to show the overlay (controlled by parent)
-//   onClose    — called when overlay is dismissed
-//   onAutoShow — called once per day when the overlay should auto-appear
-export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
-  const [partitions,  setPartitions]  = useState(null)
-  const [colors,      setColors]      = useState(null)
-  const [cartoonId,   setCartoonId]   = useState(0)
-  const [isAutoShow,  setIsAutoShow]  = useState(false)
+//   show    — whether to show the overlay (controlled by parent via easel click)
+//   onClose — called when overlay is dismissed
+export default function WeekCartoonCard({ show, onClose }) {
+  const [partitions, setPartitions] = useState(null)
+  const [colors,     setColors]     = useState(null)
+  const [cartoonId,  setCartoonId]  = useState(0)
   const { theme } = useTheme()
   const isMinimal = theme !== 'playful'
 
   const weekStart = getWeekStart()
   const todayIdx  = getDayOfWeek()
-  const today     = getTodayDate()
 
   useEffect(() => {
     async function load() {
@@ -230,11 +223,10 @@ export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
       }
 
       // Backwards-compat: old records without colours or cartoon_id
-      const needsPatch = !rec.colors || rec.cartoon_id == null
-      if (needsPatch) {
+      if (!rec.colors || rec.cartoon_id == null) {
         const patch = {}
-        if (!rec.colors)            patch.colors      = pickWeekColors()
-        if (rec.cartoon_id == null) patch.cartoon_id  = pickCartoon(-1)
+        if (!rec.colors)            patch.colors     = pickWeekColors()
+        if (rec.cartoon_id == null) patch.cartoon_id = pickCartoon(-1)
         await db.week_cartoons.update(rec.id, patch)
         rec = { ...rec, ...patch }
       }
@@ -242,17 +234,9 @@ export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
       setPartitions(rec.partition_states)
       setColors(rec.colors)
       setCartoonId(rec.cartoon_id)
-
-      // Trigger auto-show once per day — mark as animate-worthy
-      const lastSeen = localStorage.getItem('wc_last_shown')
-      if (lastSeen !== today) {
-        localStorage.setItem('wc_last_shown', today)
-        setIsAutoShow(true)
-        setTimeout(() => onAutoShow?.(), 500)
-      }
     }
     load()
-  }, [weekStart, todayIdx, today])  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [weekStart, todayIdx])  // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!partitions || !colors) return null
   if (!show) return null
@@ -265,7 +249,6 @@ export default function WeekCartoonCard({ show, onClose, onAutoShow }) {
       todayIdx={todayIdx}
       isMinimal={isMinimal}
       onClose={onClose}
-      animate={isAutoShow}
     />
   )
 }
