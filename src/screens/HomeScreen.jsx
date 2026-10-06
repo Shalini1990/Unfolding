@@ -122,9 +122,24 @@ export default function HomeScreen() {
   const [showNotifNudge, setShowNotifNudge] = useState(false)
   const [algoState, setAlgoState] = useState(null)
 
-  const isEvening = new Date().getHours() >= 17
+  const [isEvening, setIsEvening] = useState(new Date().getHours() >= 17)
 
-  const today = getTodayDate()
+  // Re-check every minute so evening card appears at 5 PM even if app was already open
+  const [today, setToday] = useState(getTodayDate())
+
+  // Re-check every minute: update evening flag and reload if date has changed (midnight)
+  useEffect(() => {
+    const tick = () => {
+      setIsEvening(new Date().getHours() >= 17)
+      const newDate = getTodayDate()
+      setToday(prev => {
+        if (prev !== newDate) window.location.reload() // day changed — reload fresh
+        return prev
+      })
+    }
+    const id = setInterval(tick, 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     async function loadData() {
@@ -140,9 +155,25 @@ export default function HomeScreen() {
       ])
       setTodayRecord(daily || null)
       setNorthStar(ns?.text || null)
-      setTomorrowText(tmr?.text || null)
-      setTomorrowDateSet(tmr?.date_set || null)
       setEveningDone(!!eveningEntry)
+
+      // Expire tomorrow intention after the day it was set for has ended
+      if (tmr?.text && tmr?.date_set) {
+        const setDate = new Date(tmr.date_set + 'T00:00:00')
+        const expiryDate = new Date(setDate)
+        expiryDate.setDate(expiryDate.getDate() + 2) // valid for the next day only
+        if (new Date() >= expiryDate) {
+          await db.tomorrow_intention.delete(1)
+          setTomorrowText(null)
+          setTomorrowDateSet(null)
+        } else {
+          setTomorrowText(tmr.text)
+          setTomorrowDateSet(tmr.date_set)
+        }
+      } else {
+        setTomorrowText(tmr?.text || null)
+        setTomorrowDateSet(tmr?.date_set || null)
+      }
 
       // Install date → day number for quote thumbs visibility
       const installRec = await db.settings.where('key').equals('install_date').first()
@@ -157,19 +188,46 @@ export default function HomeScreen() {
 
       // Quote: pick a fresh one if we don't have today's yet
       let qd = await db.quote_data.get(1)
+      let aiSpark = null
+
       if (!qd || qd.today_date !== today) {
-        const shownQuotes = qd?.shown_quotes || []
-        const newQuote = pickQuote(shownQuotes, qd?.blocked_themes || [])
-        qd = {
-          id: 1,
-          today_quote: newQuote,
-          today_date: today,
-          today_thumb: null,
-          shown_quotes: [...shownQuotes, newQuote],
-          favourites: qd?.favourites || [],
-          blocked_themes: qd?.blocked_themes || [],
+        // Try AI-generated quote + spark first
+        try {
+          const aiRes = await fetch('/api/daily', { method: 'POST' })
+          if (aiRes.ok) {
+            const aiData = await aiRes.json()
+            if (aiData.quote) {
+              const shownQuotes = qd?.shown_quotes || []
+              qd = {
+                id: 1,
+                today_quote: aiData.quote,
+                today_date: today,
+                today_thumb: null,
+                shown_quotes: [...shownQuotes, aiData.quote],
+                favourites: qd?.favourites || [],
+                blocked_themes: qd?.blocked_themes || [],
+              }
+              await db.quote_data.put(qd)
+            }
+            if (aiData.spark) aiSpark = aiData
+          }
+        } catch (_) { /* fall through to static */ }
+
+        // Static fallback if AI failed
+        if (!qd || qd.today_date !== today) {
+          const shownQuotes = qd?.shown_quotes || []
+          const newQuote = pickQuote(shownQuotes, qd?.blocked_themes || [])
+          qd = {
+            id: 1,
+            today_quote: newQuote,
+            today_date: today,
+            today_thumb: null,
+            shown_quotes: [...shownQuotes, newQuote],
+            favourites: qd?.favourites || [],
+            blocked_themes: qd?.blocked_themes || [],
+          }
+          await db.quote_data.put(qd)
         }
-        await db.quote_data.put(qd)
       }
       setQuoteState(qd)
 
@@ -180,20 +238,33 @@ export default function HomeScreen() {
       // Spark: pick a fresh one if we don't have today's yet
       let spark = await db.spark_log.where('date').equals(today).first()
       if (!spark) {
-        const thirtyDaysAgo = new Date()
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-        const cutoffStr = thirtyDaysAgo.toISOString().split('T')[0]
-        const recentLog = await db.spark_log.where('date').aboveOrEqual(cutoffStr).toArray()
-        const recentIds = recentLog.map(e => e.task_id)
-
-        const task = pickSparkAdaptive(recentIds, algo, new Date().getDay())
-        const newEntry = {
-          date: today,
-          task_id: task.id,
-          task_text: task.text,
-          type: task.type,
-          difficulty: task.difficulty,
-          completion_status: 'pending',
+        let newEntry
+        if (aiSpark?.spark) {
+          // Use AI-generated spark
+          newEntry = {
+            date: today,
+            task_id: `ai-${today}`,
+            task_text: aiSpark.spark,
+            type: aiSpark.spark_type || 'novelty',
+            difficulty: 'medium',
+            completion_status: 'pending',
+          }
+        } else {
+          // Static fallback
+          const thirtyDaysAgo = new Date()
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+          const cutoffStr = thirtyDaysAgo.toISOString().split('T')[0]
+          const recentLog = await db.spark_log.where('date').aboveOrEqual(cutoffStr).toArray()
+          const recentIds = recentLog.map(e => e.task_id)
+          const task = pickSparkAdaptive(recentIds, algo, new Date().getDay())
+          newEntry = {
+            date: today,
+            task_id: task.id,
+            task_text: task.text,
+            type: task.type,
+            difficulty: task.difficulty,
+            completion_status: 'pending',
+          }
         }
         const id = await db.spark_log.add(newEntry)
         spark = { id, ...newEntry }

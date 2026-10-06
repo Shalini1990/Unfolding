@@ -1026,7 +1026,9 @@ export default function MeScreen() {
 
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10)
-    db.spark_log.where('completion_status').equals('done').reverse().sortBy('date').then(setSparks).catch(() => {})
+    db.spark_log.orderBy('date').reverse().toArray()
+      .then(all => setSparks(all.filter(s => s.completion_status === 'done')))
+      .catch(() => {})
     // Exclude today — history shows completed days only, consistent with intentions & spark
     db.reflection_entries.orderBy('date').reverse().toArray()
       .then(all => setReflections(all.filter(r => r.date < today)))

@@ -1,4 +1,4 @@
-import { clientsClaim, skipWaiting } from 'workbox-core'
+import { clientsClaim } from 'workbox-core'
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 import { CacheFirst, NetworkFirst } from 'workbox-strategies'
@@ -6,8 +6,10 @@ import { ExpirationPlugin } from 'workbox-expiration'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 
 // ── Activation ────────────────────────────────────────────────────
-// Take over immediately so the first visit is fully SW-controlled.
-skipWaiting()
+// clientsClaim() so the SW controls all tabs immediately on first install.
+// skipWaiting() is intentionally NOT called here — we want the new SW to
+// wait so the "Update available" toast can appear and let the user choose
+// when to reload. The SKIP_WAITING message below handles the actual skip.
 clientsClaim()
 
 // ── App shell precache ────────────────────────────────────────────

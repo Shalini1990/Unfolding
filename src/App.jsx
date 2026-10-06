@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate, useLocation } from 'react-router-dom'
+import posthog from 'posthog-js'
 import FeaturesContext, { ALL_FEATURES } from './context/FeaturesContext'
 import BottomNav from './components/BottomNav'
 import PauseButton from './components/PauseButton'
@@ -28,6 +29,12 @@ export default function App() {
   const [features,           setFeatures]           = useState(ALL_FEATURES)
   const [tourActive,         setTourActive]         = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // ── Track SPA route changes in PostHog ───────────────────────────
+  useEffect(() => {
+    posthog.capture('$pageview', { $current_url: window.location.href })
+  }, [location.pathname])
 
   const loadFeatures = useCallback(async () => {
     try {
