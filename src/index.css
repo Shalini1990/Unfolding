@@ -228,7 +228,7 @@ body {
   flex: 1;
   overflow-y: auto;
   overscroll-behavior-y: none;
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 5px);
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 15px);
   -webkit-overflow-scrolling: touch;
 }
 
