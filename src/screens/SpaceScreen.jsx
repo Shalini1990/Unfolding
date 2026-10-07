@@ -35,11 +35,30 @@ export default function SpaceScreen() {
   const isHardDay    = kwMode   === 'hardday'
   const focused      = isRevisiting || isHardDay
 
-  // Hide the bottom nav while TheRoom is open so it can't overlap the overlay
+  // Hide bottom nav and lock body scroll while TheRoom is open
   useEffect(() => {
-    if (roomOpen) document.body.classList.add('room-open')
-    else          document.body.classList.remove('room-open')
-    return ()  => document.body.classList.remove('room-open')
+    if (roomOpen) {
+      document.body.classList.add('room-open')
+      // Lock body to prevent iOS from pushing the page up when keyboard opens
+      document.body.style.position = 'fixed'
+      document.body.style.width    = '100%'
+      document.body.style.top      = `-${window.scrollY}px`
+    } else {
+      const scrollY = parseInt(document.body.style.top || '0') * -1
+      document.body.classList.remove('room-open')
+      document.body.style.position = ''
+      document.body.style.width    = ''
+      document.body.style.top      = ''
+      window.scrollTo(0, scrollY)
+    }
+    return () => {
+      const scrollY = parseInt(document.body.style.top || '0') * -1
+      document.body.classList.remove('room-open')
+      document.body.style.position = ''
+      document.body.style.width    = ''
+      document.body.style.top      = ''
+      window.scrollTo(0, scrollY)
+    }
   }, [roomOpen])
 
   function handleDoorChange(newDoor) {
