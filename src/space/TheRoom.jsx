@@ -37,9 +37,29 @@ export default function TheRoom({ onClose }) {
   const holdStartRef  = useRef(null)
   const rafRef        = useRef(null)
   const editorRef     = useRef(null)
+  const overlayRef    = useRef(null)
   // Keep a ref to phase so startHold closure sees fresh value
   const phaseRef      = useRef(phase)
   useEffect(() => { phaseRef.current = phase }, [phase])
+
+  // ── Visual viewport — adjust writing area bottom padding when
+  //    keyboard opens so the overlay never moves ──────────────────
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    function onViewport() {
+      const area = overlayRef.current?.querySelector('.room-writing-area')
+      if (!area) return
+      const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      area.style.paddingBottom = keyboardHeight > 0 ? `${keyboardHeight + 16}px` : ''
+    }
+    vv.addEventListener('resize', onViewport)
+    vv.addEventListener('scroll', onViewport)
+    return () => {
+      vv.removeEventListener('resize', onViewport)
+      vv.removeEventListener('scroll', onViewport)
+    }
+  }, [])
 
   const lineCount   = text.trim() ? text.split('\n').filter(l => l.length > 0).length : 0
   const isReleasing = phase === 'releasing'
@@ -93,7 +113,20 @@ export default function TheRoom({ onClose }) {
     setText(raw)
     if (raw.trim() && phase === 'entered') setPhase('writing')
     if (!raw.trim() && phase === 'writing') setPhase('entered')
-    requestAnimationFrame(updateColors)
+    requestAnimationFrame(() => {
+      updateColors()
+      // Scroll writing area so cursor stays above keyboard
+      const sel = window.getSelection()
+      if (!sel?.rangeCount) return
+      const rect      = sel.getRangeAt(0).getBoundingClientRect()
+      const vv        = window.visualViewport
+      const viewH     = vv ? vv.offsetTop + vv.height : window.innerHeight
+      const padding   = 48 // space below cursor
+      if (rect.bottom + padding > viewH) {
+        const area = editorRef.current?.parentElement
+        if (area) area.scrollTop += rect.bottom + padding - viewH
+      }
+    })
   }
 
   // Strip rich formatting on paste
@@ -158,7 +191,7 @@ export default function TheRoom({ onClose }) {
 
   // ── Render ────────────────────────────────────────────────────
   return (
-    <div className={`room-overlay${isClosing ? ' room-overlay--closing' : ''}`}>
+    <div ref={overlayRef} className={`room-overlay${isClosing ? ' room-overlay--closing' : ''}`}>
 
       {/* Breadcrumb */}
       <div className="room-breadcrumb">
@@ -205,7 +238,6 @@ export default function TheRoom({ onClose }) {
           {/* Writing area — single contenteditable div handles both input and display */}
           {(phase === 'entered' || phase === 'writing' || phase === 'releasing' || phase === 'fading') && (
             <div className={`room-writing-area${phase === 'fading' ? ' room-writing-area--fading' : ''}`}>
-              <div className="room-writing-spacer" aria-hidden="true" />
               <div
                 ref={editorRef}
                 className="room-editor"

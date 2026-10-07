@@ -5623,7 +5623,7 @@ body.room-open .pause-button { display: none !important; }
   display: flex;
   flex-direction: column;
   margin-top: 28px;
-  margin-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  margin-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -5634,10 +5634,7 @@ body.room-open .pause-button { display: none !important; }
    typed character appears near the vertical middle of the screen.
    Shrinks as the editor grows; once the editor fills the area the
    writing area scrolls to keep the cursor in view. */
-.room-writing-spacer {
-  flex: 0 0 40%;
-  min-height: 0;
-}
+.room-writing-spacer { display: none; }
 
 .room-writing-area--fading {
   animation: room-text-fade 0.45s ease-in-out both;
@@ -5654,12 +5651,12 @@ body.room-open .pause-button { display: none !important; }
 .room-editor {
   width:        100%;
   min-height:   2em;
-  font-family:  var(--font-heading);
-  font-size:    21px;
-  line-height:  1.5;
+  font-family:  var(--font-sans);
+  font-size:    var(--fs-body);
+  line-height:  1.7;
   letter-spacing: 0.2px;
-  color:        #efe4cd;
-  caret-color:  #efe4cd;
+  color:        #7eb8f7;
+  caret-color:  #7eb8f7;
   word-break:   break-word;
   outline:      none;
   cursor:       text;
