@@ -65,6 +65,20 @@ export default function TheRoom({ onClose }) {
   const isReleasing = phase === 'releasing'
   const breadcrumb  = isReleasing ? 'Releasing…' : 'YOUR SAFE SPACE'
 
+  // Lock body scroll on mount so iOS doesn't push page up when keyboard opens
+  useEffect(() => {
+    const scrollY = window.scrollY
+    document.body.style.position = 'fixed'
+    document.body.style.width    = '100%'
+    document.body.style.top      = `-${scrollY}px`
+    return () => {
+      document.body.style.position = ''
+      document.body.style.width    = ''
+      document.body.style.top      = ''
+      window.scrollTo(0, scrollY)
+    }
+  }, [])
+
   // Initialise editor with an empty div line (Chrome default structure)
   useEffect(() => {
     const el = editorRef.current

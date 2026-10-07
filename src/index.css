@@ -5597,9 +5597,14 @@ body.room-open .pause-button { display: none !important; }
 /* ── Ritual lines (entered state) ────────────────────── */
 
 .room-ritual {
-  margin-top: 64px;
+  position: absolute;
+  top: 50%;
+  left: 22px;
+  right: 22px;
+  transform: translateY(-50%);
   text-align: center;
   animation: room-fade-in 0.4s ease-out both;
+  pointer-events: none;
 }
 
 .room-ritual p {
