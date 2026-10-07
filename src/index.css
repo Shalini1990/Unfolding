@@ -2117,7 +2117,7 @@ body.room-open .pause-button { display: none !important; }
   flex-direction: column;
   gap: 20px;
   padding-top: 52px;
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 5px);
+  padding-bottom: 0;
 }
 
 /* ── Greeting header ──────────────────────────────── */
