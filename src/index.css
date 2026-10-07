@@ -5655,8 +5655,8 @@ body.room-open .pause-button { display: none !important; }
   font-size:    var(--fs-body);
   line-height:  1.7;
   letter-spacing: 0.2px;
-  color:        #7eb8f7;
-  caret-color:  #7eb8f7;
+  color:        #efe4cd;
+  caret-color:  #efe4cd;
   word-break:   break-word;
   outline:      none;
   cursor:       text;
