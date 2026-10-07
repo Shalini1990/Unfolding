@@ -7,12 +7,36 @@ GitHub: https://github.com/Shalini1990/Unfolding
 A local-first daily wellness PWA. No backend database — all journal data lives in IndexedDB (Dexie.js) on the user's device. The only network calls are the Groq AI endpoints (`/api/chat`, `/api/daily`) and PostHog analytics.
 
 ## Deploy workflow
+
+**Vercel does NOT auto-deploy from GitHub** — always deploy manually.
+
 ```bash
+cd /Users/anirudh/Downloads/Claude/unfolding
+
+# Step 1: deploy
 npm run deploy
-# The alias step fails automatically — always run this after:
+
+# Step 2: the alias step in the deploy script always fails (jq returns null)
+# Get the new URL from the output (looks like unfolding-xxxx-shalinipasupuleti-5357s-projects.vercel.app)
+# then run:
 npx vercel alias set <new-deployment-url> unfolding-yourstory.vercel.app
 ```
-The alias must be set manually every deploy or the live URL stays on the old version.
+
+**Live alias:** `unfolding-yourstory.vercel.app`  
+**Vercel project:** `shalinipasupuleti-5357s-projects/unfolding`
+
+Every deploy needs both steps or the live URL stays on the old version. If unsure which deploy is latest:
+```bash
+npx vercel ls 2>&1 | grep "Ready" | head -3
+```
+Then alias the top one.
+
+After deploying, always **commit + push to GitHub** too so the repo stays in sync:
+```bash
+git add -p   # stage relevant files only — skip Unfolding.zip, design_handoff_release/, easel-icons/
+git commit -m "your message"
+git push
+```
 
 ## Tech stack
 - React 19 + Vite
