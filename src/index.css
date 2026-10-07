@@ -5660,7 +5660,7 @@ body.room-open .pause-button { display: none !important; }
   width:        100%;
   min-height:   2em;
   font-family:  var(--font-sans);
-  font-size:    var(--fs-body);
+  font-size:    16px; /* must be ≥16px to prevent iOS auto-zoom on focus */
   line-height:  1.7;
   letter-spacing: 0.2px;
   color:        #efe4cd;
