@@ -5531,7 +5531,10 @@ body.room-open .pause-button { display: none !important; }
 
 .room-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100dvh; /* shrinks to visible area when keyboard opens — no jumping */
   background: #1a1510;
   z-index: 300; /* above bottom nav (250) */
   display: flex;

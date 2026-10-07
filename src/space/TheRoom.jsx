@@ -37,62 +37,21 @@ export default function TheRoom({ onClose }) {
   const holdStartRef  = useRef(null)
   const rafRef        = useRef(null)
   const editorRef     = useRef(null)
-  const overlayRef    = useRef(null)
   // Keep a ref to phase so startHold closure sees fresh value
   const phaseRef      = useRef(phase)
   useEffect(() => { phaseRef.current = phase }, [phase])
 
-  // ── Visual viewport — adjust writing area bottom padding when
-  //    keyboard opens so the overlay never moves ──────────────────
-  useEffect(() => {
-    const vv = window.visualViewport
-    if (!vv) return
-    function onViewport() {
-      const area = overlayRef.current?.querySelector('.room-writing-area')
-      if (!area) return
-      const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
-      area.style.paddingBottom = keyboardHeight > 0 ? `${keyboardHeight + 16}px` : ''
-    }
-    vv.addEventListener('resize', onViewport)
-    vv.addEventListener('scroll', onViewport)
-    return () => {
-      vv.removeEventListener('resize', onViewport)
-      vv.removeEventListener('scroll', onViewport)
-    }
-  }, [])
 
   const lineCount   = text.trim() ? text.split('\n').filter(l => l.length > 0).length : 0
   const isReleasing = phase === 'releasing'
   const breadcrumb  = isReleasing ? 'Releasing…' : 'YOUR SAFE SPACE'
 
-  // Lock body scroll on mount so iOS doesn't push page up when keyboard opens
-  useEffect(() => {
-    const scrollY = window.scrollY
-    document.body.style.position = 'fixed'
-    document.body.style.width    = '100%'
-    document.body.style.top      = `-${scrollY}px`
-    return () => {
-      document.body.style.position = ''
-      document.body.style.width    = ''
-      document.body.style.top      = ''
-      window.scrollTo(0, scrollY)
-    }
-  }, [])
-
   // Initialise editor with an empty div line (Chrome default structure)
+  // No auto-focus — user taps to type; this prevents keyboard from firing before overlay is ready
   useEffect(() => {
     const el = editorRef.current
     if (!el) return
     el.innerHTML = '<div><br></div>'
-    el.focus()
-    try {
-      const range = document.createRange()
-      range.setStart(el.firstChild, 0)
-      range.collapse(true)
-      const sel = window.getSelection()
-      sel?.removeAllRanges()
-      sel?.addRange(range)
-    } catch { /* ignore */ }
   }, [])
 
   // Cleanup RAF on unmount
@@ -205,7 +164,7 @@ export default function TheRoom({ onClose }) {
 
   // ── Render ────────────────────────────────────────────────────
   return (
-    <div ref={overlayRef} className={`room-overlay${isClosing ? ' room-overlay--closing' : ''}`}>
+    <div className={`room-overlay${isClosing ? ' room-overlay--closing' : ''}`}>
 
       {/* Breadcrumb */}
       <div className="room-breadcrumb">
